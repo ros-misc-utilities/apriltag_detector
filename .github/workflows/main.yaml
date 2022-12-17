@@ -1,0 +1,56 @@
+#
+# continuous integration workflow
+#
+name: build repo
+env:
+  PACKAGE: apriltag_detector
+on:
+ push:
+    branches: [ master]
+ pull_request:
+    branches: [ master]
+ workflow_dispatch:
+    branches: [ master]
+
+jobs:
+  build_focal_galactic:
+    runs-on: ubuntu-20.04
+    container:
+      image: berndpfrommer/focal_noetic_galactic_metavision
+    name: focal/galactic (x86_64)
+    steps:
+      - name: check out github repo
+        uses: actions/checkout@v3
+        with:
+          path: src/${{ env.PACKAGE }}
+          fetch-depth: 0
+      - name: compile from source
+        run: ./src/${{ env.PACKAGE }}/.github/scripts/build_ros2.bash ${{ env.PACKAGE }}
+
+  build_focal_noetic:
+    runs-on: ubuntu-20.04
+    name: focal/noetic (x86_64)
+    container:
+      image: berndpfrommer/focal_noetic_galactic_metavision
+    steps:
+      - name: check out github repo
+        uses: actions/checkout@v3
+        with:
+          path: src/${{ env.PACKAGE }}
+          fetch-depth: 0
+      - name: compile from source
+        run: ./src/${{ env.PACKAGE }}/.github/scripts/build_ros1.bash ${{ env.PACKAGE }}
+
+  build_jammy_humble:
+    runs-on: ubuntu-22.04
+    container:
+      image: berndpfrommer/jammy_humble_spinnaker
+    name: jammy/humble (x86_64)
+    steps:
+      - name: check out github repo
+        uses: actions/checkout@v3
+        with:
+          path: src/${{ env.PACKAGE }}
+          fetch-depth: 0
+      - name: compile from source
+        run: ./src/${{ env.PACKAGE }}/.github/scripts/build_ros2.bash ${{ env.PACKAGE }}
