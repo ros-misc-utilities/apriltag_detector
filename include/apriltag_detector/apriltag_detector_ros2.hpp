@@ -16,7 +16,7 @@
 #ifndef APRILTAG_DETECTOR__APRILTAG_DETECTOR_ROS2_HPP_
 #define APRILTAG_DETECTOR__APRILTAG_DETECTOR_ROS2_HPP_
 
-#include <apriltag_detector_msgs/msg/apriltag_array_stamped.hpp>
+#include <apriltag_msgs/msg/april_tag_detection_array.hpp>
 #include <image_transport/image_transport.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -40,7 +40,7 @@ public:
   ~ApriltagDetector();
 
 private:
-  using ApriltagArray = apriltag_detector_msgs::msg::ApriltagArrayStamped;
+  using ApriltagArray = apriltag_msgs::msg::AprilTagDetectionArray;
   void subscriptionCheckTimerExpired();
   void callback(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
   void publishDetections(

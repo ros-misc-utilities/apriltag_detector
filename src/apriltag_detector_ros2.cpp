@@ -114,20 +114,19 @@ void ApriltagDetector::publishDetections(
   for (int i = 0; i < numDetections; ++i) {
     apriltag_detection_t * t;
     zarray_get(detections, i, &t);
-    apriltag_detector_msgs::msg::Apriltag tag;
+    apriltag_msgs::msg::AprilTagDetection tag;
     tag.id = t->id;
-    tag.bits = family_->nbits;
     tag.hamming = t->hamming;
     tag.family = familyName_;
-    tag.border = 1;
-    tag.center.x = t->c[0];
-    tag.center.y = t->c[1];
+    tag.goodness = t->decision_margin;  // ??? not sure what goodness is...
+    tag.centre.x = t->c[0];
+    tag.centre.y = t->c[1];
     tag.decision_margin = t->decision_margin;
     for (int j = 0; j < 4; ++j) {
       tag.corners[j].x = t->p[j][0];
       tag.corners[j].y = t->p[j][1];
     }
-    arrayMsg.apriltags.push_back(tag);
+    arrayMsg.detections.push_back(tag);
   }
   detectPub_->publish(arrayMsg);
 }

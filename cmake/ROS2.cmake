@@ -28,7 +28,7 @@ set(ament_dependencies
   "image_transport"
   "cv_bridge"
   "sensor_msgs"
-  "apriltag_detector_msgs")
+  "apriltag_msgs")
 
 foreach(pkg ${ament_dependencies})
   find_package(${pkg} REQUIRED)
