@@ -10,30 +10,33 @@ detecting Apriltags using the [Apriltag 3](https://github.com/AprilRobotics/apri
 Currently tested on Ubuntu 20.04 under under ROS Noetic and ROS2 Galactic.
 
 ## How to build
-Create a workspace (``~/ws``), clone this repo, and use ``wstool``
+Create a workspace (``~/ws``), clone this repo, and use ``vcs``
 to pull in the remaining dependencies:
 
-```
+```bash
 pkg=apriltag_detector
 mkdir -p ~/$pkg/src
 cd ~/ws
 git clone https://github.com/berndpfrommer/${pkg}.git src/${pkg}
-wstool init src src/${pkg}/${pkg}.rosinstall
-# to update an existing space:
-# wstool merge -t src src/${pkg}/${pkg}.rosinstall
-# wstool update -t src
+cd src
+vcs import < ${pkg}/${pkg}.repos
+cd ..
+```
+Install all system packages that this package depends on:
+```bash
+rosdep install --from-paths src --ignore-src
 ```
 
 ### configure and build on ROS1:
 
-```
+```bash
 catkin config -DCMAKE_BUILD_TYPE=RelWithDebInfo  # (optionally add -DCMAKE_EXPORT_COMPILE_COMMANDS=1)
 catkin build
 ```
 
 ### configure and build on ROS2:
 
-```
+```bash
 cd ~/ws
 colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo  # (optionally add -DCMAKE_EXPORT_COMPILE_COMMANDS=1)
 ```

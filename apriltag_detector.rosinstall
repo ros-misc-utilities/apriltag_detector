@@ -1,2 +1,0 @@
-- git: {local-name: apriltag, uri: 'https://github.com/AprilRobotics/apriltag.git', version: 'v3.3.0'}
-- git: {local-name: apriltag_detector_msgs, uri: 'https://github.com/berndpfrommer/apriltag_detector_msgs.git', version: 'master'}
