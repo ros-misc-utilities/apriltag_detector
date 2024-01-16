@@ -60,6 +60,7 @@ private:
   std::string familyName_;
   apriltag_family * family_;
   int maxHamming_{1};
+  std::string imageQoSProfile_{"default"};
 };
 }  // namespace apriltag_detector_ros
 #endif  // APRILTAG_DETECTOR__APRILTAG_DETECTOR_ROS2_HPP_

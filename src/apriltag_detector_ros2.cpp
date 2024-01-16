@@ -37,6 +37,8 @@ ApriltagDetector::ApriltagDetector(const rclcpp::NodeOptions & options)
   this->get_parameter_or("decimate_factor", decimateFactor_, 1.0);
   this->get_parameter_or("blur", blurSigma_, 0.0);
   this->get_parameter_or("num_threads", numThreads_, 1);
+  this->get_parameter_or(
+    "image_qos_profile", imageQoSProfile_, std::string("sensor_data"));
 
   // publish images
   const rmw_qos_profile_t qosProf = rmw_qos_profile_default;
@@ -67,6 +69,14 @@ ApriltagDetector::~ApriltagDetector()
   }
 }
 
+rmw_qos_profile_t string_to_profile(const std::string & s)
+{
+  if (s == "sensor_data") {
+    return (rmw_qos_profile_sensor_data);
+  }
+  return (rmw_qos_profile_default);
+}
+
 void ApriltagDetector::subscriptionCheckTimerExpired()
 {
   if (imagePub_.getNumSubscribers() || detectPub_->get_subscription_count()) {
@@ -76,7 +86,8 @@ void ApriltagDetector::subscriptionCheckTimerExpired()
       imageSub_ = image_transport::create_subscription(
         this, "image",
         std::bind(&ApriltagDetector::callback, this, std::placeholders::_1),
-        "raw", rmw_qos_profile_default);
+        "raw",
+        string_to_profile(imageQoSProfile_));  // rmw_qos_profile_default);//
       isSubscribed_ = true;
     }
   } else {
