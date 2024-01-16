@@ -18,9 +18,12 @@
 #include <apriltag/apriltag.h>
 
 #include <array>
-#pragma GCC diagnostic ignored "-Wcpp"
+#ifdef USE_CV_BRIDGE_HPP
+#include <cv_bridge/cv_bridge.hpp>
+#else
 #include <cv_bridge/cv_bridge.h>
-#pragma GCC diagnostic pop
+#endif
+
 #include <opencv2/core/core.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 

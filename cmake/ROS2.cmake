@@ -34,6 +34,10 @@ foreach(pkg ${ament_dependencies})
   find_package(${pkg} REQUIRED)
 endforeach()
 
+if(${cv_bridge_VERSION} GREATER "3.3.0")
+  add_definitions(-DUSE_CV_BRIDGE_HPP)
+endif()
+
 #
 # --------- library
 #
