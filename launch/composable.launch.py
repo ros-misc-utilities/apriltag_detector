@@ -26,21 +26,21 @@ from launch_ros.descriptions import ComposableNode
 def launch_setup(context, *args, **kwargs):
     """Create composable node."""
     container = ComposableNodeContainer(
-        name="apriltag_detector_container",
-        namespace="",
-        package="rclcpp_components",
-        executable="component_container",
+        name='apriltag_detector_container',
+        namespace='',
+        package='rclcpp_components',
+        executable='component_container',
         composable_node_descriptions=[
             ComposableNode(
-                package="apriltag_detector",
-                plugin="apriltag_detector_ros::ApriltagDetector",
-                namespace=LaunchConfig("camera"),
-                parameters=[{"tag_family": LaunchConfig("tag_family")}],
-                remappings=[("image", "image_raw")],
-                extra_arguments=[{"use_intra_process_comms": True}],
+                package='apriltag_detector',
+                plugin='apriltag_detector_ros::ApriltagDetector',
+                namespace=LaunchConfig('camera'),
+                parameters=[{'tag_family': LaunchConfig('tag_family')}],
+                remappings=[('image', 'image_raw')],
+                extra_arguments=[{'use_intra_process_comms': True}],
             )
         ],
-        output="screen",
+        output='screen',
     )
     return [container]
 
@@ -49,8 +49,8 @@ def generate_launch_description():
     """Create composable node by calling opaque function."""
     return launch.LaunchDescription(
         [
-            LaunchArg("camera", default_value=["camera"], description="camera name"),
-            LaunchArg("tag_family", default_value="tf36h11", description="tag family"),
+            LaunchArg('camera', default_value=['camera'], description='camera name'),
+            LaunchArg('tag_family', default_value='tf36h11', description='tag family'),
             OpaqueFunction(function=launch_setup),
         ]
     )

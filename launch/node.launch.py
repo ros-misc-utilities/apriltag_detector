@@ -25,14 +25,14 @@ from launch_ros.actions import Node
 def launch_setup(context, *args, **kwargs):
     """Create simple node."""
     node = Node(
-        package="apriltag_detector",
-        executable="apriltag_detector_node",
-        output="screen",
-        namespace=LaunchConfig("camera"),
+        package='apriltag_detector',
+        executable='apriltag_detector_node',
+        output='screen',
+        namespace=LaunchConfig('camera'),
         # prefix=['xterm -e gdb -ex run --args'],
-        name="apriltag_detector",
-        parameters=[{"tag_family": LaunchConfig("tag_family")}],
-        remappings=[("image", "image_raw")],
+        name='apriltag_detector',
+        parameters=[{'tag_family': LaunchConfig('tag_family')}],
+        remappings=[('image', 'image_raw')],
     )
     return [node]
 
@@ -41,8 +41,8 @@ def generate_launch_description():
     """Create simple node by calling opaque function."""
     return launch.LaunchDescription(
         [
-            LaunchArg("camera", default_value=["camera"], description="camera name"),
-            LaunchArg("tag_family", default_value="tf36h11", description="tag family"),
+            LaunchArg('camera', default_value=['camera'], description='camera name'),
+            LaunchArg('tag_family', default_value='tf36h11', description='tag family'),
             OpaqueFunction(function=launch_setup),
         ]
     )

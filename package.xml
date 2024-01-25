@@ -16,7 +16,6 @@
   <test_depend condition="$ROS_VERSION == 2">ament_lint_auto</test_depend>
   <test_depend condition="$ROS_VERSION == 2">ament_lint_common</test_depend>
   <test_depend condition="$ROS_VERSION == 2">ament_cmake_clang_format</test_depend>
-  <test_depend condition="$ROS_VERSION == 2">ament_cmake_black</test_depend>
 
   <!-- ROS1 dependencies -->
   <buildtool_depend condition="$ROS_VERSION == 1">catkin</buildtool_depend>
