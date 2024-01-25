@@ -7,7 +7,7 @@ detecting Apriltags using the [Apriltag 3](https://github.com/AprilRobotics/apri
 
 ## Supported platforms
 
-Currently tested on Ubuntu 20.04 under under ROS Noetic and ROS2 Galactic.
+Currently builds under Ubuntu 22.04 with ROS2 Humble or later.
 
 ## How to build
 Create a workspace (``~/ws``), clone this repo, and use ``vcs``
@@ -17,12 +17,19 @@ to pull in the remaining dependencies:
 pkg=apriltag_detector
 mkdir -p ~/$pkg/src
 cd ~/ws
-git clone https://github.com/berndpfrommer/${pkg}.git src/${pkg}
+git clone https://github.com/ros-misc-utilities/${pkg}.git src/${pkg}
+```
+
+On ROS1 you also need the messages package:
+
+```bash
 cd src
 vcs import < ${pkg}/${pkg}.repos
 cd ..
 ```
+
 Install all system packages that this package depends on:
+
 ```bash
 rosdep install --from-paths src --ignore-src
 ```
