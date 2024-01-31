@@ -38,7 +38,13 @@ include_directories(
 #
 # --------- shared library
 #
-add_library(${PROJECT_NAME} SHARED src/apriltag_detector_ros1.cpp src/common.cpp)
+add_library(${PROJECT_NAME} SHARED
+  src/apriltag_detector_ros1.cpp
+  src/convert_detections.cpp
+  src/detector_wrapper_base.cpp
+  src/detector_wrapper.cpp
+  src/draw_tag.cpp)
+
 target_link_libraries(
   ${PROJECT_NAME} opencv_core opencv_imgproc apriltag ${catkin_LIBRARIES})
 #

@@ -25,7 +25,7 @@ int main(int argc, char ** argv)
   ros::NodeHandle pnh("~");
 
   try {
-    apriltag_detector_ros::ApriltagDetector node(pnh);
+    apriltag_detector::ApriltagDetector node(pnh);
     ros::spin();
   } catch (const std::exception & e) {
     ROS_ERROR("%s: %s", pnh.getNamespace().c_str(), e.what());

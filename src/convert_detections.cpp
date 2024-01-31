@@ -1,5 +1,5 @@
 // -*-c++-*---------------------------------------------------------------------------------------
-// Copyright 2022 Bernd Pfrommer <bernd.pfrommer@gmail.com>
+// Copyright 2024 Bernd Pfrommer <bernd.pfrommer@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,54 +13,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef APRILTAG_DETECTOR__COMMON_HPP_
-#define APRILTAG_DETECTOR__COMMON_HPP_
+#include <apriltag.h>
 
-#include <apriltag/apriltag.h>
-
-#include <string>
-
-namespace cv
-{
-class Mat;  // forward decl
-}
+#include <apriltag_detector/convert_detections.hpp>
 
 namespace apriltag_detector_ros
 {
-namespace common
-{
-apriltag_family * make_tag_family(const std::string & name);
-void destroy_tag_family(const std::string & name, apriltag_family * tf);
-cv::Mat make_image(const cv::Mat & img, const zarray_t * detections);
 
-template <class T, class A>
-T detections_to_msg(
-  const zarray_t * detections, const apriltag_family_t * fam,
-  const std::string & fname)
+void convert_detections(
+  void * det, const std::string & fam, ApriltagArray * arrayMsg)
 {
-  T arrayMsg;
+  const zarray_t * detections = reinterpret_cast<zarray_t *>(det);
   const auto numDetections = zarray_size(detections);
   for (int i = 0; i < numDetections; ++i) {
     apriltag_detection_t * t;
     zarray_get(detections, i, &t);
-    A tag;
+    Tag tag;
     tag.id = t->id;
-    tag.bits = fam->nbits;
     tag.hamming = t->hamming;
-    tag.family = fname;
-    tag.border = 1;
-    tag.center.x = t->c[0];
-    tag.center.y = t->c[1];
+    tag.family = fam;
     tag.decision_margin = t->decision_margin;
     for (int j = 0; j < 4; ++j) {
       tag.corners[j].x = t->p[j][0];
       tag.corners[j].y = t->p[j][1];
     }
-    arrayMsg.apriltags.push_back(tag);
+#ifdef USING_ROS_1
+    tag.center.x = t->c[0];
+    tag.center.y = t->c[1];
+    arrayMsg->apriltags.push_back(tag);
+#else
+    tag.goodness = 0;  // what is that?,
+    tag.centre.x = t->c[0];
+    tag.centre.y = t->c[1];
+    arrayMsg->detections.push_back(tag);
+#endif
   }
-  return (arrayMsg);
 }
 
-}  // namespace common
 }  // namespace apriltag_detector_ros
-#endif  // APRILTAG_DETECTOR__COMMON_HPP_

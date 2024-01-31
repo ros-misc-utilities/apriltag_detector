@@ -1,5 +1,5 @@
 // -*-c++-*---------------------------------------------------------------------------------------
-// Copyright 2022 Bernd Pfrommer <bernd.pfrommer@gmail.com>
+// Copyright 2024 Bernd Pfrommer <bernd.pfrommer@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,25 +13,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "apriltag_detector/apriltag_detector_ros1.hpp"
-
-#include <apriltag/apriltag.h>
 #include <cv_bridge/cv_bridge.h>
 
+#include <apriltag_detector/apriltag_detector_ros1.hpp>
+#include <apriltag_detector/detector_wrapper.hpp>
 #include <array>
 #include <opencv2/core/core.hpp>
 
-#include "apriltag_detector/common.hpp"
+namespace apriltag_detector
+{
+ApriltagDetector::ApriltagDetector(ros::NodeHandle & nh)
+: nh_(nh), detector_(new DetectorWrapper())
 
-namespace apriltag_detector_ros
 {
-ApriltagDetector::ApriltagDetector(ros::NodeHandle & nh) : nh_(nh)
-{
-  familyName_ = nh_.param<std::string>("tag_family", "tf36h11");
-  maxHamming_ = nh_.param<int>("max_hamming_distance", 0);
-  decimateFactor_ = nh_.param<double>("decimate_factor", 1.0);
-  blurSigma_ = nh_.param<double>("blur_sigma", 0.0);
-  numThreads_ = nh_.param<int>("num_threads", 1);
+  detector_->setFamily(nh_.param<std::string>("tag_family", "tf36h11"));
+  detector_->setHammingDistance(nh_.param<int>("max_hamming_distance", 0));
+  detector_->setDecimateFactor(nh_.param<double>("decimate_factor", 1.0));
+  detector_->setQuadSigma(nh_.param<double>("blur_sigma", 0.0));
+  detector_->setNumberOfThreads(nh_.param<int>("num_threads", 1));
 
   // publish images
   image_transport::ImageTransport it(nh_);
@@ -44,19 +43,6 @@ ApriltagDetector::ApriltagDetector(ros::NodeHandle & nh) : nh_(nh)
 
   // publish detections
   detectPub_ = nh_.advertise<ApriltagArray>("tags", 100);
-
-  family_ = common::make_tag_family(familyName_);
-  if (!family_) {
-    ROS_ERROR_STREAM("unknown tag family " << familyName_);
-    throw std::runtime_error("bad tag family");
-  }
-}
-
-ApriltagDetector::~ApriltagDetector()
-{
-  if (family_) {
-    common::destroy_tag_family(familyName_, family_);
-  }
 }
 
 void ApriltagDetector::imageConnectCallback(
@@ -80,51 +66,32 @@ void ApriltagDetector::imageConnectCallback(
   }
 }
 
-void ApriltagDetector::publishDetections(
-  const zarray_t * detections, const std_msgs::Header & header)
-{
-  ApriltagArray arrayMsg =
-    common::detections_to_msg<ApriltagArray, apriltag_detector_msgs::Apriltag>(
-      detections, family_, familyName_);
-  arrayMsg.header = header;
-  detectPub_.publish(arrayMsg);
-}
-
-void ApriltagDetector::publishImage(
-  const zarray_t * detections, const std_msgs::Header & header,
-  const cv::Mat & img)
-{
-  cv::Mat colorImg = common::make_image(img, detections);
-
-  cv_bridge::CvImage pubImg(
-    header, sensor_msgs::image_encodings::BGR8, colorImg);
-  imagePub_.publish(pubImg.toImageMsg());
-}
-
 void ApriltagDetector::callback(const sensor_msgs::Image::ConstPtr & msg)
 {
-  apriltag_detector_t * td = apriltag_detector_create();
-  apriltag_detector_add_family_bits(td, family_, maxHamming_);
-  td->quad_decimate = decimateFactor_;
-  td->quad_sigma = blurSigma_;
-  td->nthreads = numThreads_;
-  auto cvImg = cv_bridge::toCvShare(msg, "mono8");
-  if (!cvImg) {
-    ROS_WARN_STREAM(
-      "cannot convert image from " << msg->encoding << " to mono8");
-    return;
+  ApriltagArray arrayMsg;
+  cv_bridge::CvImageConstPtr cvImg;
+  if (
+    detectPub_.getNumSubscribers() != 0 || imagePub_.getNumSubscribers() != 0) {
+    cvImg = cv_bridge::toCvShare(msg, "mono8");
+    detector_->detect(cvImg->image, &arrayMsg);
+    if (!cvImg) {
+      ROS_WARN_STREAM(
+        "cannot convert image from " << msg->encoding << " to mono8");
+      return;
+    }
   }
-  image_u8_t img{
-    cvImg->image.cols, cvImg->image.rows,
-    static_cast<int32_t>(cvImg->image.step), cvImg->image.data};
-  // this runs the actual apriltag detector!
-  zarray_t * detections = apriltag_detector_detect(td, &img);
+
   if (detectPub_.getNumSubscribers() != 0) {
-    publishDetections(detections, msg->header);
+    arrayMsg.header = msg->header;
+    detectPub_.publish(arrayMsg);
   }
+
   if (imagePub_.getNumSubscribers() != 0) {
-    publishImage(detections, msg->header, cvImg->image);
+    cv::Mat colorImg = DetectorWrapper::draw(cvImg->image, arrayMsg);
+    cv_bridge::CvImage pubImg(
+      msg->header, sensor_msgs::image_encodings::BGR8, colorImg);
+    imagePub_.publish(pubImg.toImageMsg());
   }
 }
 
-}  // namespace apriltag_detector_ros
+}  // namespace apriltag_detector

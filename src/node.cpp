@@ -1,5 +1,5 @@
 // -*-c++-*---------------------------------------------------------------------------------------
-// Copyright 2022 Bernd Pfrommer <bernd.pfrommer@gmail.com>
+// Copyright 2024 Bernd Pfrommer <bernd.pfrommer@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,15 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <apriltag_detector/apriltag_detector.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
-
-#include "apriltag_detector/apriltag_detector_ros2.hpp"
 
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<apriltag_detector_ros::ApriltagDetector>(
+  auto node = std::make_shared<apriltag_detector::ApriltagDetector>(
     rclcpp::NodeOptions());
   rclcpp::spin(node);  // should not return
   rclcpp::shutdown();

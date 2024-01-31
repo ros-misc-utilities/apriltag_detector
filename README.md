@@ -77,7 +77,7 @@ Parameters:
   use ``decimate_factor=2``.
 - ``blur``. Gaussian blur to apply. Defaults to 0 (no blur). Can be
   negative to sharpen.
-- ``image_qos_profile``. QoS profile of image messages that are subscribed to. Defaults to ``sensor_data``, but can also be set to ``default``. Use this parameter to achieve QoS compatibility when subscribing to image data.
+- ``image_qos_profile``. QoS profile of image messages that are subscribed to. Defaults to ``default``, but can also be set to ``sensor_data``. Use this parameter to achieve QoS compatibility when subscribing to image data.
 - ``num_threads``. Number of threads on which the Apriltag library
   will operate. Defaults to 1.
 

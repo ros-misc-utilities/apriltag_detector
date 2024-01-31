@@ -24,43 +24,26 @@
 #include <memory>
 #include <string>
 
-class apriltag_family;           // forward decl
-struct zarray;                   // forward decl
-typedef struct zarray zarray_t;  // forward decl
-namespace cv
+namespace apriltag_detector
 {
-class Mat;  // forward decl
-}
-
-namespace apriltag_detector_ros
-{
+class DetectorWrapper;  // forward decl
 class ApriltagDetector
 {
 public:
   explicit ApriltagDetector(ros::NodeHandle & nh);
-  ~ApriltagDetector();
+  ~ApriltagDetector() = default;
 
 private:
   using ApriltagArray = apriltag_detector_msgs::ApriltagArrayStamped;
   void imageConnectCallback(const image_transport::SingleSubscriberPublisher &);
   void callback(const sensor_msgs::Image::ConstPtr & msg);
-  void publishDetections(
-    const zarray_t * detections, const std_msgs::Header & header);
-  void publishImage(
-    const zarray_t * detections, const std_msgs::Header & header,
-    const cv::Mat & img);
   // ------------------------  variables ------------------------------
   ros::NodeHandle nh_;
   ros::Publisher detectPub_;
   image_transport::Subscriber imageSub_;
   image_transport::Publisher imagePub_;
   bool isSubscribed_{false};
-  double decimateFactor_{1};
-  double blurSigma_{0};
-  int numThreads_{1};
-  std::string familyName_;
-  apriltag_family * family_;
-  int maxHamming_{1};
+  std::shared_ptr<DetectorWrapper> detector_;
 };
-}  // namespace apriltag_detector_ros
+}  // namespace apriltag_detector
 #endif  // APRILTAG_DETECTOR__APRILTAG_DETECTOR_ROS1_HPP_

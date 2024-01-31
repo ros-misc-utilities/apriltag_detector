@@ -1,5 +1,5 @@
 # -*- cmake -*-
-# Copyright 2022 Bernd Pfrommer <bernd.pfrommer@gmail.com>
+# Copyright 2024 Bernd Pfrommer <bernd.pfrommer@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,24 +39,43 @@ if(${cv_bridge_VERSION} GREATER "3.3.0")
 endif()
 
 #
-# --------- library
+# --------- wrapper library (exported)
 #
-add_library(${PROJECT_NAME} SHARED src/apriltag_detector_ros2.cpp src/common.cpp)
-ament_target_dependencies(${PROJECT_NAME} ${ament_dependencies})
-target_link_libraries(${PROJECT_NAME} opencv_core opencv_imgproc apriltag)
+add_library(detector_wrapper SHARED
+  src/detector_wrapper.cpp
+  src/detector_wrapper_base.cpp
+  src/convert_detections.cpp
+  src/draw_tag.cpp)
+
+ament_target_dependencies(detector_wrapper ${ament_dependencies})
+target_link_libraries(detector_wrapper opencv_core opencv_imgproc apriltag)
 
 target_include_directories(
-    ${PROJECT_NAME}
+    detector_wrapper
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>)
 
-rclcpp_components_register_nodes(${PROJECT_NAME} "${PROJECT_NAME}_ros::ApriltagDetector")
+ament_export_targets(${PROJECT_NAME}_export HAS_LIBRARY_TARGET)
+ament_export_dependencies(apriltag OpenCV)
+
+#
+# --------- composable node library (private)
+#
+add_library(${PROJECT_NAME} SHARED
+  src/apriltag_detector.cpp)
+
+ament_target_dependencies(${PROJECT_NAME} ${ament_dependencies})
+target_link_libraries(${PROJECT_NAME} opencv_core opencv_imgproc detector_wrapper)
+
+target_include_directories(${PROJECT_NAME} PRIVATE include)
+
+rclcpp_components_register_nodes(${PROJECT_NAME} "${PROJECT_NAME}::ApriltagDetector")
 
 #
 # -------- node
 #
-add_executable(${PROJECT_NAME}_node src/node_ros2.cpp)
+add_executable(${PROJECT_NAME}_node src/node.cpp)
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
 
 # the node must go into the paroject specific lib directory or else
@@ -69,9 +88,23 @@ install(TARGETS
 # the shared library goes into the global lib dir so it can
 # be used as a composable node by other projects
 
-install(TARGETS
-  ${PROJECT_NAME}
+install(
+  TARGETS detector_wrapper
+  EXPORT ${PROJECT_NAME}_export
   DESTINATION lib
+)
+
+install(
+  TARGETS ${PROJECT_NAME}
+  DESTINATION lib
+)
+
+install(
+  DIRECTORY include/
+  DESTINATION include
+  FILES_MATCHING
+  PATTERN "detector_wrapper*.hpp"
+  PATTERN "detector_wrapper_ros1.hpp" EXCLUDE
 )
 
 install(DIRECTORY

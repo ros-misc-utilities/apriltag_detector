@@ -1,5 +1,5 @@
 // -*-c++-*---------------------------------------------------------------------------------------
-// Copyright 2022 Bernd Pfrommer <bernd.pfrommer@gmail.com>
+// Copyright 2024 Bernd Pfrommer <bernd.pfrommer@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,31 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <nodelet/nodelet.h>
-#include <ros/ros.h>
-
-#include <memory>
-
-#include "apriltag_detector/apriltag_detector_ros1.hpp"
+#include <apriltag_detector/convert_detections.hpp>
+#include <apriltag_detector/detector_wrapper.hpp>
+#include <apriltag_detector/draw_msg.hpp>
 
 namespace apriltag_detector
 {
-class ApriltagDetectorNodelet : public nodelet::Nodelet
+
+void DetectorWrapper::detect(const cv::Mat & img, ApriltagArray * arrayMsg)
 {
-public:
-  void onInit() override
-  {
-    nh_ = getPrivateNodeHandle();
-    node_ = std::make_shared<ApriltagDetector>(nh_);
-  }
+  void * det = this->detectTags(img);
+  apriltag_detector_ros::convert_detections(det, family_name_, arrayMsg);
+  this->freeDetections(det);
+}
 
-private:
-  // ------ variables --------
-  std::shared_ptr<ApriltagDetector> node_;
-  ros::NodeHandle nh_;
-};
+cv::Mat DetectorWrapper::draw(const cv::Mat & img, const ApriltagArray & msg)
+{
+  return (draw_msg(img, msg));
+}
+
 }  // namespace apriltag_detector
-
-#include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS(
-  apriltag_detector::ApriltagDetectorNodelet, nodelet::Nodelet)

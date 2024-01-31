@@ -1,5 +1,5 @@
 // -*-c++-*---------------------------------------------------------------------------------------
-// Copyright 2022 Bernd Pfrommer <bernd.pfrommer@gmail.com>
+// Copyright 2024 Bernd Pfrommer <bernd.pfrommer@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,31 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <nodelet/nodelet.h>
-#include <ros/ros.h>
+#ifndef APRILTAG_DETECTOR__DRAW_TAG_HPP_
+#define APRILTAG_DETECTOR__DRAW_TAG_HPP_
 
-#include <memory>
+#include <array>
 
-#include "apriltag_detector/apriltag_detector_ros1.hpp"
-
+namespace cv
+{
+class Mat;  // forward decl
+}
 namespace apriltag_detector
 {
-class ApriltagDetectorNodelet : public nodelet::Nodelet
+namespace draw_tag
 {
-public:
-  void onInit() override
-  {
-    nh_ = getPrivateNodeHandle();
-    node_ = std::make_shared<ApriltagDetector>(nh_);
-  }
+void draw(
+  cv::Mat & img, int id, const std::array<double, 2> & a,
+  const std::array<std::array<double, 2>, 4> & c);
 
-private:
-  // ------ variables --------
-  std::shared_ptr<ApriltagDetector> node_;
-  ros::NodeHandle nh_;
-};
+}  // namespace draw_tag
 }  // namespace apriltag_detector
-
-#include <pluginlib/class_list_macros.h>
-PLUGINLIB_EXPORT_CLASS(
-  apriltag_detector::ApriltagDetectorNodelet, nodelet::Nodelet)
+#endif  // APRILTAG_DETECTOR__DRAW_TAG_HPP_
