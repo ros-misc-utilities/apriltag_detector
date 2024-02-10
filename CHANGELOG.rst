@@ -2,7 +2,7 @@
 Changelog for package apriltag_detector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.0.0 (2024-02-09)
+------------------
 * initial release
 * Contributors: Bernd Pfrommer
