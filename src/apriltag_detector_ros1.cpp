@@ -22,12 +22,12 @@
 
 namespace apriltag_detector
 {
-ApriltagDetector::ApriltagDetector(ros::NodeHandle & nh)
-: nh_(nh), detector_(new DetectorWrapper())
+ApriltagDetector::ApriltagDetector(ros::NodeHandle & nh) : nh_(nh)
 
 {
-  detector_->setFamily(nh_.param<std::string>("tag_family", "tf36h11"));
-  detector_->setHammingDistance(nh_.param<int>("max_hamming_distance", 0));
+  detector_.reset(new DetectorWrapper(
+    nh_.param<std::string>("tag_family", "tf36h11"),
+    nh_.param<int>("max_hamming_distance", 0)));
   detector_->setDecimateFactor(nh_.param<double>("decimate_factor", 1.0));
   detector_->setQuadSigma(nh_.param<double>("blur_sigma", 0.0));
   detector_->setNumberOfThreads(nh_.param<int>("num_threads", 1));

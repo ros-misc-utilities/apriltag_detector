@@ -88,9 +88,16 @@ apriltag_family_t * to_fam(void * p)
 
 zarray_t * to_z(void * p) { return (reinterpret_cast<zarray_t *>(p)); }
 
-DetectorWrapperBase::DetectorWrapperBase()
+DetectorWrapperBase::DetectorWrapperBase(const std::string & fam, int hamming)
 {
   detector_ = reinterpret_cast<void *>(apriltag_detector_create());
+  family_name_ = fam;
+  family_ = make_tag_family(fam);
+  if (!family_) {
+    throw(std::runtime_error("invalid tag family specified!"));
+  }
+  apriltag_detector_add_family_bits(
+    recast(detector_), to_fam(family_), hamming);
 }
 
 DetectorWrapperBase::~DetectorWrapperBase()
@@ -101,25 +108,6 @@ DetectorWrapperBase::~DetectorWrapperBase()
   if (family_) {
     destroy_tag_family(family_name_, to_fam(family_));
   }
-}
-
-void DetectorWrapperBase::setFamily(const std::string & fam)
-{
-  family_name_ = fam;
-  family_ = make_tag_family(fam);
-  if (!family_) {
-    throw(std::runtime_error("invalid tag family specified!"));
-  }
-}
-
-void DetectorWrapperBase::setHammingDistance(int hamming)
-{
-  if (!family_) {
-    throw(std::runtime_error("must first set tag family!"));
-  }
-
-  apriltag_detector_add_family_bits(
-    recast(detector_), to_fam(family_), hamming);
 }
 
 void DetectorWrapperBase::setQuadSigma(double blur)

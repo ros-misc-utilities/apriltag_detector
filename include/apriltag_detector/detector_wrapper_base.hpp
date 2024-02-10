@@ -29,11 +29,9 @@ namespace apriltag_detector_ros
 class DetectorWrapperBase
 {
 public:
-  DetectorWrapperBase();
+  DetectorWrapperBase(const std::string & fam, int hamming);
   ~DetectorWrapperBase();
 
-  void setFamily(const std::string & fam);
-  void setHammingDistance(int hamming);
   void setQuadSigma(double blur);
   void setDecimateFactor(double decimate_factor);
   void setNumberOfThreads(int num_threads);

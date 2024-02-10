@@ -19,6 +19,10 @@
 
 namespace apriltag_detector
 {
+DetectorWrapper::DetectorWrapper(const std::string & fam, int ham)
+: DetectorWrapperBase(fam, ham)
+{
+}
 
 void DetectorWrapper::detect(const cv::Mat & img, ApriltagArray * arrayMsg)
 {

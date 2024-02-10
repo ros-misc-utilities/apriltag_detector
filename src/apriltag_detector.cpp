@@ -31,11 +31,11 @@ ApriltagDetector::ApriltagDetector(const rclcpp::NodeOptions & options)
 : Node(
     "apriltag_detector",
     rclcpp::NodeOptions(options)
-      .automatically_declare_parameters_from_overrides(true)),
-  detector_(new DetectorWrapper())
+      .automatically_declare_parameters_from_overrides(true))
 {
-  detector_->setFamily(get_parameter_or("tag_family", std::string("tf36h11")));
-  detector_->setHammingDistance(get_parameter_or("max_hamming_distance", 0));
+  detector_.reset(new DetectorWrapper(
+    get_parameter_or("tag_family", std::string("tf36h11")),
+    get_parameter_or<int>("max_hamming_distance", 0)));
   detector_->setDecimateFactor(get_parameter_or("decimate_factor", 1.0));
   detector_->setQuadSigma(get_parameter_or("blur", 0.0));
   detector_->setNumberOfThreads(get_parameter_or("num_threads", 1));

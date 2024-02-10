@@ -39,7 +39,7 @@ public:
   using ApriltagArray = apriltag_msgs::msg::AprilTagDetectionArray;
 #endif
 
-  DetectorWrapper() = default;
+  DetectorWrapper(const std::string & fam, int ham);
   ~DetectorWrapper() = default;
 
   void detect(const cv::Mat & img, ApriltagArray * arrayMsg);
