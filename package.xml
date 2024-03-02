@@ -24,6 +24,7 @@
   <depend condition="$ROS_VERSION == 1">apriltag_detector_msgs</depend>
 
   <!-- common ROS1/ROS2 dependencies -->
+  <buildtool_depend>ros_environment</buildtool_depend> <!-- ROS_VERSION + ROS_DISTRO -->
   <depend>image_transport</depend>
   <depend>sensor_msgs</depend>
   <depend>cv_bridge</depend>
