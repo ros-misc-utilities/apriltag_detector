@@ -2,8 +2,8 @@
 Changelog for package apriltag_detector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+1.2.1 (2024-03-02)
+------------------
 * added missing dependency on ros_environment
 * Contributors: Bernd Pfrommer
 
