@@ -1,5 +1,0 @@
-repositories:
-  apriltag_detector_msgs:
-    type: git
-    url: https://github.com/berndpfrommer/apriltag_detector_msgs.git
-    version: master
