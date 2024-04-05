@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef APRILTAG_DETECTOR__APRILTAG_DETECTOR_HPP_
-#define APRILTAG_DETECTOR__APRILTAG_DETECTOR_HPP_
+#ifndef APRILTAG_DETECTOR_UMICH__APRILTAG_DETECTOR_HPP_
+#define APRILTAG_DETECTOR_UMICH__APRILTAG_DETECTOR_HPP_
 
 #include <apriltag_msgs/msg/april_tag_detection_array.hpp>
 #include <image_transport/image_transport.hpp>
@@ -23,7 +23,7 @@
 #include <sensor_msgs/msg/image.hpp>
 #include <string>
 
-namespace apriltag_detector
+namespace apriltag_detector_umich
 {
 class DetectorWrapper;  // forward decl
 
@@ -46,5 +46,5 @@ private:
   std::string imageQoSProfile_{"default"};
   std::shared_ptr<DetectorWrapper> detector_;
 };
-}  // namespace apriltag_detector
-#endif  // APRILTAG_DETECTOR__APRILTAG_DETECTOR_HPP_
+}  // namespace apriltag_detector_umich
+#endif  // APRILTAG_DETECTOR_UMICH__APRILTAG_DETECTOR_HPP_

@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <apriltag_detector/convert_detections.hpp>
-#include <apriltag_detector/detector_wrapper.hpp>
-#include <apriltag_detector/draw_msg.hpp>
+#include <apriltag_detector_umich/convert_detections.hpp>
+#include <apriltag_detector_umich/detector_wrapper.hpp>
+#include <apriltag_detector_umich/draw_msg.hpp>
 
-namespace apriltag_detector
+namespace apriltag_detector_umich
 {
 DetectorWrapper::DetectorWrapper(const std::string & fam, int ham)
 : DetectorWrapperBase(fam, ham)
@@ -27,7 +27,7 @@ DetectorWrapper::DetectorWrapper(const std::string & fam, int ham)
 void DetectorWrapper::detect(const cv::Mat & img, ApriltagArray * arrayMsg)
 {
   void * det = this->detectTags(img);
-  apriltag_detector_ros::convert_detections(det, family_name_, arrayMsg);
+  convert_detections(det, family_name_, arrayMsg);
   this->freeDetections(det);
 }
 
@@ -36,4 +36,4 @@ cv::Mat DetectorWrapper::draw(const cv::Mat & img, const ApriltagArray & msg)
   return (draw_msg(img, msg));
 }
 
-}  // namespace apriltag_detector
+}  // namespace apriltag_detector_umich

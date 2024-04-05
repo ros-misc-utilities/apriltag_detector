@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <apriltag_detector/apriltag_detector.hpp>
+#include <apriltag_detector_umich/apriltag_detector.hpp>
 #include <array>
 #ifdef USE_CV_BRIDGE_HPP
 #include <cv_bridge/cv_bridge.hpp>
@@ -21,11 +21,11 @@
 #include <cv_bridge/cv_bridge.h>
 #endif
 
-#include <apriltag_detector/detector_wrapper.hpp>
+#include <apriltag_detector_umich/detector_wrapper.hpp>
 #include <opencv2/core/core.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 
-namespace apriltag_detector
+namespace apriltag_detector_umich
 {
 ApriltagDetector::ApriltagDetector(const rclcpp::NodeOptions & options)
 : Node(
@@ -124,6 +124,6 @@ void ApriltagDetector::callback(
   }
 }
 
-}  // namespace apriltag_detector
+}  // namespace apriltag_detector_umich
 
-RCLCPP_COMPONENTS_REGISTER_NODE(apriltag_detector::ApriltagDetector)
+RCLCPP_COMPONENTS_REGISTER_NODE(apriltag_detector_umich::ApriltagDetector)

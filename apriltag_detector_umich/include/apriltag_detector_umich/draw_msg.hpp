@@ -13,38 +13,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef APRILTAG_DETECTOR__DRAW_MSG_HPP_
-#define APRILTAG_DETECTOR__DRAW_MSG_HPP_
+#ifndef APRILTAG_DETECTOR_UMICH__DRAW_MSG_HPP_
+#define APRILTAG_DETECTOR_UMICH__DRAW_MSG_HPP_
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "draw_tag.hpp"
 
-namespace apriltag_detector
+namespace apriltag_detector_umich
 {
 template <class T>
 static cv::Mat draw_msg(const cv::Mat & img, const T & msg)
 {
   cv::Mat colorImg;
   cv::cvtColor(img, colorImg, cv::COLOR_GRAY2BGR);
-#ifdef USING_ROS_1
-  const auto & all_tags = msg.apriltags;
-#else
   const auto & all_tags = msg.detections;
-#endif
   for (const auto & tag : all_tags) {
     const auto & c = tag.corners;
     const std::array<std::array<double, 2>, 4> corners{
       {{c[0].x, c[0].y}, {c[1].x, c[1].y}, {c[2].x, c[2].y}, {c[3].x, c[3].y}}};
-#ifdef USING_ROS_1
-    draw_tag::draw(colorImg, tag.id, {tag.center.x, tag.center.y}, corners);
-#else
     draw_tag::draw(colorImg, tag.id, {tag.centre.x, tag.centre.y}, corners);
-#endif
   }
   return (colorImg);
 }
 
-}  // namespace apriltag_detector
-#endif  // APRILTAG_DETECTOR__DRAW_MSG_HPP_
+}  // namespace apriltag_detector_umich
+#endif  // APRILTAG_DETECTOR_UMICH__DRAW_MSG_HPP_

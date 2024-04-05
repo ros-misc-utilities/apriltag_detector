@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <apriltag_detector/apriltag_detector.hpp>
+#include <apriltag_detector_umich/apriltag_detector.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<apriltag_detector::ApriltagDetector>(
+  auto node = std::make_shared<apriltag_detector_umich::ApriltagDetector>(
     rclcpp::NodeOptions());
   rclcpp::spin(node);  // should not return
   rclcpp::shutdown();

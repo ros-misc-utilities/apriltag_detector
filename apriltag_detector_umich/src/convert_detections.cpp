@@ -15,9 +15,9 @@
 
 #include <apriltag.h>
 
-#include <apriltag_detector/convert_detections.hpp>
+#include <apriltag_detector_umich/convert_detections.hpp>
 
-namespace apriltag_detector_ros
+namespace apriltag_detector_umich
 {
 
 void convert_detections(
@@ -50,4 +50,4 @@ void convert_detections(
   }
 }
 
-}  // namespace apriltag_detector_ros
+}  // namespace apriltag_detector_umich

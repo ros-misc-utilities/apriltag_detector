@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <apriltag_detector/draw_tag.hpp>
+#include <apriltag_detector_umich/draw_tag.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 
-namespace apriltag_detector
+namespace apriltag_detector_umich
 {
 namespace draw_tag
 {
@@ -61,4 +61,4 @@ void draw(
 }
 
 }  // namespace draw_tag
-}  // namespace apriltag_detector
+}  // namespace apriltag_detector_umich

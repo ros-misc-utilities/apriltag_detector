@@ -13,31 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef APRILTAG_DETECTOR__DETECTOR_WRAPPER_HPP_
-#define APRILTAG_DETECTOR__DETECTOR_WRAPPER_HPP_
+#ifndef APRILTAG_DETECTOR_UMICH__DETECTOR_WRAPPER_HPP_
+#define APRILTAG_DETECTOR_UMICH__DETECTOR_WRAPPER_HPP_
 
-#include <apriltag_detector/detector_wrapper_base.hpp>
+#include <apriltag_detector_umich/detector_wrapper_base.hpp>
+#include <apriltag_msgs/msg/april_tag_detection_array.hpp>
 #include <memory>
 #include <opencv2/core/core.hpp>
 #include <string>
 
-#ifdef USING_ROS_1
-#include <apriltag_detector_msgs/ApriltagArrayStamped.h>
-#else
-#include <apriltag_msgs/msg/april_tag_detection_array.hpp>
-#endif
-
-namespace apriltag_detector
+namespace apriltag_detector_umich
 {
-class DetectorWrapper : public apriltag_detector_ros::DetectorWrapperBase
+class DetectorWrapper : public apriltag_detector_umich::DetectorWrapperBase
 {
 public:
   using SharedPtr = std::shared_ptr<DetectorWrapper>;
-#ifdef USING_ROS_1
-  using ApriltagArray = apriltag_detector_msgs::ApriltagArrayStamped;
-#else
   using ApriltagArray = apriltag_msgs::msg::AprilTagDetectionArray;
-#endif
 
   DetectorWrapper(const std::string & fam, int ham);
   ~DetectorWrapper() = default;
@@ -45,5 +36,5 @@ public:
   void detect(const cv::Mat & img, ApriltagArray * arrayMsg);
   static cv::Mat draw(const cv::Mat & img, const ApriltagArray & msg);
 };
-}  // namespace apriltag_detector
-#endif  // APRILTAG_DETECTOR__DETECTOR_WRAPPER_HPP_
+}  // namespace apriltag_detector_umich
+#endif  // APRILTAG_DETECTOR_UMICH__DETECTOR_WRAPPER_HPP_

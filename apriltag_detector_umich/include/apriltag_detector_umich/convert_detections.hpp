@@ -13,27 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef APRILTAG_DETECTOR__CONVERT_DETECTIONS_HPP_
-#define APRILTAG_DETECTOR__CONVERT_DETECTIONS_HPP_
+#ifndef APRILTAG_DETECTOR_UMICH__CONVERT_DETECTIONS_HPP_
+#define APRILTAG_DETECTOR_UMICH__CONVERT_DETECTIONS_HPP_
 
-#ifdef USING_ROS_1
-#include <apriltag_detector_msgs/ApriltagArrayStamped.h>
-#else
 #include <apriltag_msgs/msg/april_tag_detection_array.hpp>
-#endif
-#include <string>
 
-namespace apriltag_detector_ros
+namespace apriltag_detector_umich
 {
-#ifdef USING_ROS_1
-using ApriltagArray = apriltag_detector_msgs::ApriltagArrayStamped;
-using Tag = apriltag_detector_msgs::Apriltag;
-#else
 using ApriltagArray = apriltag_msgs::msg::AprilTagDetectionArray;
 using Tag = apriltag_msgs::msg::AprilTagDetection;
-#endif
 void convert_detections(
   void * detections, const std::string & fam, ApriltagArray * arrayMsg);
-}  // namespace apriltag_detector_ros
+}  // namespace apriltag_detector_umich
 
-#endif  // APRILTAG_DETECTOR__CONVERT_DETECTIONS_HPP_
+#endif  // APRILTAG_DETECTOR_UMICH__CONVERT_DETECTIONS_HPP_

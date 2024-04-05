@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef APRILTAG_DETECTOR__DETECTOR_WRAPPER_BASE_HPP_
-#define APRILTAG_DETECTOR__DETECTOR_WRAPPER_BASE_HPP_
+#ifndef APRILTAG_DETECTOR_UMICH__DETECTOR_WRAPPER_BASE_HPP_
+#define APRILTAG_DETECTOR_UMICH__DETECTOR_WRAPPER_BASE_HPP_
 
 #include <memory>
 #include <string>
@@ -24,7 +24,7 @@ namespace cv
 struct Mat;  // forward decl
 }
 
-namespace apriltag_detector_ros
+namespace apriltag_detector_umich
 {
 class DetectorWrapperBase
 {
@@ -44,5 +44,5 @@ protected:
   void * family_{nullptr};
   std::string family_name_;
 };
-}  // namespace apriltag_detector_ros
-#endif  // APRILTAG_DETECTOR__DETECTOR_WRAPPER_BASE_HPP_
+}  // namespace apriltag_detector_umich
+#endif  // APRILTAG_DETECTOR_UMICH__DETECTOR_WRAPPER_BASE_HPP_

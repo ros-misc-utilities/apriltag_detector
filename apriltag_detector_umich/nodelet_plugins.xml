@@ -1,9 +1,0 @@
-<library path="lib/libapriltag_detector_nodelet">
-  <class name="apriltag_detector/ApriltagDetectorNodelet"
-         type="apriltag_detector_ros::ApriltagDetectorNodelet"
-         base_class_type="nodelet::Nodelet">
-    <description>
-    apriltag  detector nodelet
-    </description>
-  </class>
-</library>

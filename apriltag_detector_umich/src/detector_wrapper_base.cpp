@@ -23,11 +23,11 @@
 #include <tagStandard41h12.h>
 #include <tagStandard52h13.h>
 
-#include <apriltag_detector/detector_wrapper_base.hpp>
+#include <apriltag_detector_umich/detector_wrapper_base.hpp>
 #include <opencv2/core/core.hpp>
 #include <stdexcept>
 
-namespace apriltag_detector_ros
+namespace apriltag_detector_umich
 {
 
 static apriltag_family * make_tag_family(const std::string & name)
@@ -138,4 +138,4 @@ void DetectorWrapperBase::freeDetections(void * det)
   apriltag_detections_destroy(d);
 }
 
-}  // namespace apriltag_detector_ros
+}  // namespace apriltag_detector_umich

@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef APRILTAG_DETECTOR__DRAW_TAG_HPP_
-#define APRILTAG_DETECTOR__DRAW_TAG_HPP_
+#ifndef APRILTAG_DETECTOR_UMICH__DRAW_TAG_HPP_
+#define APRILTAG_DETECTOR_UMICH__DRAW_TAG_HPP_
 
 #include <array>
 
@@ -22,7 +22,7 @@ namespace cv
 {
 class Mat;  // forward decl
 }
-namespace apriltag_detector
+namespace apriltag_detector_umich
 {
 namespace draw_tag
 {
@@ -31,5 +31,5 @@ void draw(
   const std::array<std::array<double, 2>, 4> & c);
 
 }  // namespace draw_tag
-}  // namespace apriltag_detector
-#endif  // APRILTAG_DETECTOR__DRAW_TAG_HPP_
+}  // namespace apriltag_detector_umich
+#endif  // APRILTAG_DETECTOR_UMICH__DRAW_TAG_HPP_
