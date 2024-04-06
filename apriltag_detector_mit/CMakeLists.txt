@@ -48,10 +48,10 @@ pluginlib_export_plugin_description_file(apriltag_detector plugins.xml)
 
 
 #
-# --------- composable node library (exported)
+# --------- plugin library with node-free detector (exported)
 #
 add_library(${PROJECT_NAME} SHARED
-  src/apriltag_detector.cpp)
+  src/detector.cpp)
 
 ament_target_dependencies(${PROJECT_NAME} ${ament_dependencies})
 target_link_libraries(${PROJECT_NAME} apriltag_mit::apriltag_mit)
@@ -65,13 +65,30 @@ target_include_directories(
 ament_export_targets(${PROJECT_NAME}_export HAS_LIBRARY_TARGET)
 ament_export_libraries(${PROJECT_NAME})  
 
-rclcpp_components_register_nodes(${PROJECT_NAME} "${PROJECT_NAME}::ApriltagDetector")
+#
+# --------- composable node library (exported)
+#
+add_library(${PROJECT_NAME}_component SHARED
+  src/component.cpp)
+
+ament_target_dependencies(${PROJECT_NAME}_component ${ament_dependencies})
+target_link_libraries(${PROJECT_NAME}_component ${PROJECT_NAME})
+
+target_include_directories(
+  ${PROJECT_NAME}_component
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+
+ament_export_libraries(${PROJECT_NAME}_component)
+
+rclcpp_components_register_nodes(${PROJECT_NAME}_component "${PROJECT_NAME}::ApriltagDetector")
 
 #
 # -------- node
 #
 add_executable(${PROJECT_NAME}_node src/node.cpp)
-target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME}_component)
 
 # the node must go into the paroject specific lib directory or else
 # the launch file will not find it
@@ -84,7 +101,7 @@ install(TARGETS
 # be used as a composable node by other projects
 
 install(
-  TARGETS ${PROJECT_NAME}
+  TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_component
   EXPORT ${PROJECT_NAME}_export
   DESTINATION lib
 )

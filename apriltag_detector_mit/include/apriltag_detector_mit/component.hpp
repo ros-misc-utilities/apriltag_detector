@@ -13,56 +13,45 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef APRILTAG_DETECTOR_MIT__APRILTAG_DETECTOR_HPP_
-#define APRILTAG_DETECTOR_MIT__APRILTAG_DETECTOR_HPP_
+#ifndef APRILTAG_DETECTOR_MIT__COMPONENT_HPP_
+#define APRILTAG_DETECTOR_MIT__COMPONENT_HPP_
 
-#include <apriltag_detector/apriltag_detector.hpp>
+#include <apriltag_detector_mit/detector.hpp>
 #include <apriltag_msgs/msg/april_tag_detection_array.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
 #include <string>
 
-namespace AprilTags
-{
-class TagDetector;
-}
-
 namespace image_transport
 {
-class Subscriber;
-}
-
-namespace image_transport
-{
-class Subscriber;
+class Subscriber;  // forward decl
 }
 
 namespace apriltag_detector_mit
 {
-class ApriltagDetector : public apriltag_detector::ApriltagDetector,
-                         public rclcpp::Node
+class Detector;  // forward decl
+
+class Component : public rclcpp::Node
 {
 public:
   using ApriltagArray = apriltag_msgs::msg::AprilTagDetectionArray;
   using Image = sensor_msgs::msg::Image;
-  explicit ApriltagDetector(
+  explicit Component(
     const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
-  ~ApriltagDetector();
-  virtual void detect(const Image * img, ApriltagArray * tags) final;
+  ~Component();
 
 private:
   void subscriptionCheckTimerExpired();
   void callback(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
   // ------------------------  variables ------------------------------
-  std::string family_;
   rclcpp::TimerBase::SharedPtr subscription_check_timer_;
   rclcpp::Publisher<ApriltagArray>::SharedPtr detect_pub_;
   std::shared_ptr<image_transport::Subscriber> image_sub_;
   bool is_subscribed_{false};
   std::string image_qos_profile_{"default"};
   std::string in_transport_{"raw"};
-  std::shared_ptr<AprilTags::TagDetector> detector_;
+  std::shared_ptr<Detector> detector_;
 };
 }  // namespace apriltag_detector_mit
-#endif  // APRILTAG_DETECTOR_MIT__APRILTAG_DETECTOR_HPP_
+#endif  // APRILTAG_DETECTOR_MIT__COMPONENT_HPP_

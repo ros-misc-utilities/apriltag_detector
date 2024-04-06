@@ -27,7 +27,7 @@ find_package(sensor_msgs REQUIRED)
 # --------- header-only library
 #
 add_library(${PROJECT_NAME} INTERFACE
-  include/apriltag_detector/apriltag_detector.hpp)
+  include/apriltag_detector/detector.hpp)
   ament_target_dependencies(${PROJECT_NAME} INTERFACE sensor_msgs apriltag_msgs)
 
 target_include_directories(

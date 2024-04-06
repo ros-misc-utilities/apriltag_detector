@@ -13,21 +13,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef APRILTAG_DETECTOR__APRILTAG_DETECTOR_HPP_
-#define APRILTAG_DETECTOR__APRILTAG_DETECTOR_HPP_
+#ifndef APRILTAG_DETECTOR__DETECTOR_HPP_
+#define APRILTAG_DETECTOR__DETECTOR_HPP_
 
 #include <apriltag_msgs/msg/april_tag_detection_array.hpp>
 #include <sensor_msgs/msg/image.hpp>
+#include <string>
 
 namespace apriltag_detector
 {
-class ApriltagDetector
+class Detector
 {
 public:
-  virtual ~ApriltagDetector() {}
-  virtual void detect(
-    const sensor_msgs::msg::Image * img,
-    apriltag_msgs::msg::AprilTagDetectionArray * tags) = 0;
+  using ApriltagArray = apriltag_msgs::msg::AprilTagDetectionArray;
+  using Image = sensor_msgs::msg::Image;
+  virtual ~Detector() {}
+  virtual void detect(const Image * img, ApriltagArray * tags) = 0;
+  virtual void setFamily(const std::string & fam) = 0;
+  virtual void setBlackBorder(int width) = 0;
+  virtual void setDecimateFactor(double factor) = 0;
+  virtual void setQuadSigma(double blur) = 0;
+  virtual void setNumberOfThreads(int i) = 0;
+  virtual const std::string & getFamily() const = 0;
 };
 }  // namespace apriltag_detector
-#endif  // APRILTAG_DETECTOR__APRILTAG_DETECTOR_HPP_
+#endif  // APRILTAG_DETECTOR__DETECTOR_HPP_
