@@ -1,7 +1,9 @@
 # ROS MIT Apriltag detector package
 
-This repository has ROS2 compents for detecting Apriltags using the
+This repository has ROS2 components for detecting Apriltags using the
 [MIT apriltag library implementation](https://people.csail.mit.edu/kaess/apriltags).
+
+For documentation also see [the base repository](https://github.com/ros-misc-utilities/apriltag_detector).
 
 ## Supported platforms
 
@@ -12,7 +14,7 @@ Should work on Ubuntu under all ROS2 distros starting with Humble.
 ### From packages
 
 ```bash
-sudo apt-get install ros-${ROS_DISTRO}-apriltag_detector_mit
+sudo apt-get install ros-${ROS_DISTRO}-apriltag-detector-mit
 ```
 
 ### From source
@@ -27,20 +29,22 @@ and follow the [instructions here](https://github.com/ros-misc-utilities/.github
 ## How to run
 
 ```
-ros2 launch apriltag_detector_mit composable_node.launch.py camera:=my_camera_name
+ros2 launch apriltag_detector_mit detector.launch.py camera:=my_camera_name
 ros2 run rqt_image_view rqt_image_view
 ```
 
 ## Topics
 
-- ``image``. Topic of image to subscribe to.
+- ``~/image``: (subscribe) image topic.
+- ``~/tags``: (publish) tag detections.
 
 ## Parameters
 
-- ``tag_family``. Apriltag family. Allowed values: ``tf16h5``, ``tf25h9``, ``tf36h11``. Default: ``tf36h11``.
-- ``image_transport``. The type of image transport to use, e.g. ``compressed``. Default: ``raw``.
+- ``black_border_width``. Integer specifying the thickness of the black border (in bits). Default: 1.
 - ``image_qos_profile``. QoS profile for image subscription. Allowed values: ``default``, `` sensor_data``.
     Use this parameter to achieve QoS compatibility when subscribing to image data. Defaults to ``default``. 
+- ``image_transport``. The type of image transport to use, e.g. ``compressed``. Default: ``raw``.
+- ``tag_family``. Apriltag family. Allowed values: ``tf16h5``, ``tf25h9``, ``tf36h11``. Default: ``tf36h11``.
 
 ## License
 

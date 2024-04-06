@@ -40,6 +40,7 @@ public:
   void setDecimateFactor(double) final {}
   void setQuadSigma(double) final {}
   void setNumberOfThreads(int) final {}
+  void setMaxAllowedHammingDistance(int) final {}
   const std::string & getFamily() const final { return (family_); }
 
 private:

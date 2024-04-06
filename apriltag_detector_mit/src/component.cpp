@@ -28,7 +28,7 @@ Component::Component(const rclcpp::NodeOptions & options)
 {
   detector_->setFamily(get_parameter_or("tag_family", std::string("tf36h11")));
   in_transport_ = get_parameter_or("image_transport", std::string("raw"));
-  detector_->setBlackBorder(get_parameter_or("border_bits", 1));
+  detector_->setBlackBorder(get_parameter_or("black_border_width", 1));
   get_parameter_or(
     "image_qos_profile", image_qos_profile_, std::string("default"));
 
