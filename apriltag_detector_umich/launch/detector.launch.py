@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# Copyright 2022 Bernd Pfrommer <bernd.pfrommer@gmail.com>
+# Copyright 2024 Bernd Pfrommer <bernd.pfrommer@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ from launch_ros.descriptions import ComposableNode
 
 def launch_setup(context, *args, **kwargs):
     """Create composable node."""
+    transport = LaunchConfig('image_transport').perform(context)
+    suffix = '' if transport == 'raw' else ('/' + transport)
     container = ComposableNodeContainer(
         name='apriltag_detector_container',
         namespace='',
@@ -32,11 +34,22 @@ def launch_setup(context, *args, **kwargs):
         executable='component_container',
         composable_node_descriptions=[
             ComposableNode(
-                package='apriltag_detector',
-                plugin='apriltag_detector_ros::ApriltagDetector',
+                package='apriltag_detector_umich',
+                plugin='apriltag_detector_umich::Component',
                 namespace=LaunchConfig('camera'),
-                parameters=[{'tag_family': LaunchConfig('tag_family')}],
-                remappings=[('image', 'image_raw')],
+                parameters=[
+                    {
+                        'blur': LaunchConfig('blur'),
+                        'decimate_factor': LaunchConfig('decimate_factor'),
+                        'image_transport': LaunchConfig('image_transport'),
+                        'max_allowed_hamming_distance': LaunchConfig(
+                            'max_allowed_hamming_distance'
+                        ),
+                        'num_threads': LaunchConfig('num_threads'),
+                        'tag_family': LaunchConfig('tag_family'),
+                    }
+                ],
+                remappings=[('image' + suffix, 'image_raw' + suffix)],
                 extra_arguments=[{'use_intra_process_comms': True}],
             )
         ],
@@ -49,8 +62,19 @@ def generate_launch_description():
     """Create composable node by calling opaque function."""
     return launch.LaunchDescription(
         [
+            LaunchArg('blur', default_value=['0.0'], description='gaussian blur'),
             LaunchArg('camera', default_value=['camera'], description='camera name'),
-            LaunchArg('tag_family', default_value='tf36h11', description='tag family'),
+            LaunchArg('decimate_factor', default_value=['1.0'], description='decimation factor'),
+            LaunchArg(
+                'image_transport', default_value=['raw'], description='input image transport'
+            ),
+            LaunchArg(
+                'max_allowed_hamming_distance',
+                default_value=['0'],
+                description='maximum allowed hamming distance',
+            ),
+            LaunchArg('num_threads', default_value=['1'], description='number of threads to use'),
+            LaunchArg('tag_family', default_value=['tf36h11'], description='tag family'),
             OpaqueFunction(function=launch_setup),
         ]
     )

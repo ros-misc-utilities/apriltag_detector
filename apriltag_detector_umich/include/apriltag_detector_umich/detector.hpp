@@ -13,23 +13,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef APRILTAG_DETECTOR_UMICH__DRAW_TAG_HPP_
-#define APRILTAG_DETECTOR_UMICH__DRAW_TAG_HPP_
+#ifndef APRILTAG_DETECTOR_UMICH__DETECTOR_HPP_
+#define APRILTAG_DETECTOR_UMICH__DETECTOR_HPP_
 
-#include <array>
+#include <apriltag_detector/detector.hpp>
+#include <memory>
+#include <rclcpp/rclcpp.hpp>
+#include <string>
 
-namespace cv
-{
-class Mat;  // forward decl
-}
 namespace apriltag_detector_umich
 {
-namespace draw_tag
+class DetectorImpl;  // forward decl
+class Detector : public apriltag_detector::Detector
 {
-void draw(
-  cv::Mat & img, int id, const std::array<double, 2> & a,
-  const std::array<std::array<double, 2>, 4> & c);
+public:
+  Detector();
+  void detect(const Image * img, ApriltagArray * tags) final;
+  void setFamily(const std::string & fam) final;
+  void setBlackBorder(int) final {}
+  void setDecimateFactor(double) final;
+  void setQuadSigma(double) final;
+  void setNumberOfThreads(int) final;
+  void setMaxAllowedHammingDistance(int) final;
+  const std::string & getFamily() const final;
 
-}  // namespace draw_tag
+private:
+  std::shared_ptr<DetectorImpl> detector_{nullptr};
+};
 }  // namespace apriltag_detector_umich
-#endif  // APRILTAG_DETECTOR_UMICH__DRAW_TAG_HPP_
+#endif  // APRILTAG_DETECTOR_UMICH__DETECTOR_HPP_

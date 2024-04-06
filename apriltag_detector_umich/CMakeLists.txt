@@ -20,16 +20,22 @@ add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_ros REQUIRED)
+
+find_package(OpenCV REQUIRED COMPONENTS core imgproc)
 
 set(ament_dependencies
   "apriltag"
+  "apriltag_detector"
   "apriltag_msgs"
   "cv_bridge"
   "image_transport"
+  "pluginlib"
   "rclcpp"
   "rclcpp_components"
   "sensor_msgs")
-
+  
+  
 foreach(pkg ${ament_dependencies})
   find_package(${pkg} REQUIRED)
 endforeach()
@@ -38,45 +44,52 @@ if(${cv_bridge_VERSION} GREATER "3.3.0")
   add_definitions(-DUSE_CV_BRIDGE_HPP)
 endif()
 
-#
-# --------- wrapper library (exported)
-#
-add_library(detector_wrapper SHARED
-  src/detector_wrapper.cpp
-  src/detector_wrapper_base.cpp
-  src/convert_detections.cpp
-  src/draw_tag.cpp)
+pluginlib_export_plugin_description_file(apriltag_detector plugins.xml)
 
-ament_target_dependencies(detector_wrapper ${ament_dependencies})
-target_link_libraries(detector_wrapper opencv_core opencv_imgproc apriltag)
+
+#
+# --------- plugin library with node-free detector (exported)
+#
+add_library(${PROJECT_NAME} SHARED
+  src/detector_impl.cpp
+  src/detector.cpp)
+
+ament_target_dependencies(${PROJECT_NAME} ${ament_dependencies})
+target_link_libraries(${PROJECT_NAME} apriltag)
 
 target_include_directories(
-    detector_wrapper
+  ${PROJECT_NAME}
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>)
 
 ament_export_targets(${PROJECT_NAME}_export HAS_LIBRARY_TARGET)
-ament_export_dependencies(apriltag OpenCV)
+ament_export_libraries(${PROJECT_NAME})  
 
 #
-# --------- composable node library (private)
+# --------- composable node library (exported)
 #
-add_library(${PROJECT_NAME} SHARED
-  src/apriltag_detector.cpp)
+add_library(${PROJECT_NAME}_component SHARED
+  src/component.cpp)
 
-ament_target_dependencies(${PROJECT_NAME} ${ament_dependencies})
-target_link_libraries(${PROJECT_NAME} opencv_core opencv_imgproc detector_wrapper)
+ament_target_dependencies(${PROJECT_NAME}_component ${ament_dependencies})
+target_link_libraries(${PROJECT_NAME}_component ${PROJECT_NAME})
 
-target_include_directories(${PROJECT_NAME} PRIVATE include)
+target_include_directories(
+  ${PROJECT_NAME}_component
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
 
-rclcpp_components_register_nodes(${PROJECT_NAME} "${PROJECT_NAME}::ApriltagDetector")
+ament_export_libraries(${PROJECT_NAME}_component)
+
+rclcpp_components_register_nodes(${PROJECT_NAME}_component "${PROJECT_NAME}::Component")
 
 #
 # -------- node
 #
 add_executable(${PROJECT_NAME}_node src/node.cpp)
-target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME}_component)
 
 # the node must go into the paroject specific lib directory or else
 # the launch file will not find it
@@ -89,13 +102,8 @@ install(TARGETS
 # be used as a composable node by other projects
 
 install(
-  TARGETS detector_wrapper
+  TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_component
   EXPORT ${PROJECT_NAME}_export
-  DESTINATION lib
-)
-
-install(
-  TARGETS ${PROJECT_NAME}
   DESTINATION lib
 )
 
@@ -103,8 +111,7 @@ install(
   DIRECTORY include/
   DESTINATION include
   FILES_MATCHING
-  PATTERN "detector_wrapper*.hpp"
-  PATTERN "detector_wrapper_ros1.hpp" EXCLUDE
+  PATTERN "apriltag_detector.hpp"
 )
 
 install(DIRECTORY

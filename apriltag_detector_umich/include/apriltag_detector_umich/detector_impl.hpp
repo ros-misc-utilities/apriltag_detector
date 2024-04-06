@@ -13,38 +13,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef APRILTAG_DETECTOR_UMICH__APRILTAG_DETECTOR_HPP_
-#define APRILTAG_DETECTOR_UMICH__APRILTAG_DETECTOR_HPP_
+#ifndef APRILTAG_DETECTOR_UMICH__DETECTOR_IMPL_HPP_
+#define APRILTAG_DETECTOR_UMICH__DETECTOR_IMPL_HPP_
 
 #include <apriltag_msgs/msg/april_tag_detection_array.hpp>
-#include <image_transport/image_transport.hpp>
-#include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
 #include <string>
 
 namespace apriltag_detector_umich
 {
-class DetectorWrapper;  // forward decl
-
-class ApriltagDetector : public rclcpp::Node
+class DetectorImpl
 {
 public:
-  explicit ApriltagDetector(const rclcpp::NodeOptions & options);
-  ~ApriltagDetector();
+  using ApriltagArray = apriltag_msgs::msg::AprilTagDetectionArray;
+  using Image = sensor_msgs::msg::Image;
+  DetectorImpl();
+  ~DetectorImpl();
+
+  void detect(const Image * imgMsg, ApriltagArray * tags);
+  void setFamily(const std::string & fam);
+  void setDecimateFactor(double);
+  void setQuadSigma(double);
+  void setNumberOfThreads(int);
+  void setMaxAllowedHammingDistance(int);
+  const std::string & getFamily() const { return (family_); }
 
 private:
-  using ApriltagArray = apriltag_msgs::msg::AprilTagDetectionArray;
-  void subscriptionCheckTimerExpired();
-  void callback(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
+  void makeDetector();
+  void destroyDetector();
+  void resetDetector();
   // ------------------------  variables ------------------------------
-  rclcpp::TimerBase::SharedPtr subscriptionCheckTimer_;
-  rclcpp::Publisher<ApriltagArray>::SharedPtr detectPub_;
-  image_transport::Subscriber imageSub_;
-  image_transport::Publisher imagePub_;
-  bool isSubscribed_{false};
-  std::string imageQoSProfile_{"default"};
-  std::shared_ptr<DetectorWrapper> detector_;
+  std::string family_{"tf36h11"};
+  int max_allowed_hamming_distance_{0};
+  void * tag_family_{nullptr};
+  void * detector_{nullptr};
 };
+
 }  // namespace apriltag_detector_umich
-#endif  // APRILTAG_DETECTOR_UMICH__APRILTAG_DETECTOR_HPP_
+#endif  // APRILTAG_DETECTOR_UMICH__DETECTOR_IMPL_HPP_
