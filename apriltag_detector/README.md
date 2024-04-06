@@ -2,43 +2,76 @@
 
 ![banner image](images/apriltag_detections.png)
 
-This repository has ROS/ROS2 nodes and nodelets/components for
-detecting Apriltags using the [Apriltag 3](https://github.com/AprilRobotics/apriltag) library.
+This package has the base class header files for apriltag detector plugins
+for the [UMich](../apriltag_detector_umich/README.md) and the
+[MIT](../apriltag_detector_mit/README.md) detector.
+
+It also has launch files for both of these detectors, so by installing this package
+you can use both of these detectors.
 
 ## Supported platforms
 
-Currently builds under Ubuntu 22.04 with ROS2 Humble or later.
+Should work on Ubuntu under all ROS2 distros starting with Humble.
 
-## How to build
-Create a workspace (``~/ws``), clone this repo, and use ``vcs``
-to pull in the remaining dependencies:
+## Installation
+
+### From packages
 
 ```bash
-pkg=apriltag_detector
-mkdir -p ~/$pkg/src
-cd ~/ws
-git clone https://github.com/ros-misc-utilities/${pkg}.git src/${pkg}
+sudo apt-get install ros-${ROS_DISTRO}-apriltag-detector
 ```
 
-On ROS1 you also need the messages package:
+### From source
 
+Set the following shell variables:
 ```bash
-cd src
-vcs import < ${pkg}/${pkg}.repos
-cd ..
+repo=apriltag_detector
+url=https://github.com/ros-misc-utilities/${repo}.git
 ```
+and follow the [instructions here](https://github.com/ros-misc-utilities/.github/blob/master/docs/build_ros_repository.md)
 
-Install all system packages that this package depends on:
+## How to run
 
-```bash
-rosdep install --from-paths src --ignore-src
 ```
+ros2 launch apriltag_detector detector.launch.py type:=umich camera:=my_camera_name
+ros2 run rqt_image_view rqt_image_view
+```
+Then publish image under topic ``/my_camera_name/image_raw``.
 
-### configure and build on ROS1:
+NOTE: you must subscribe to the tags topic or else the detector will not subscribe to images!
 
-```bash
-catkin config -DCMAKE_BUILD_TYPE=RelWithDebInfo  # (optionally add -DCMAKE_EXPORT_COMPILE_COMMANDS=1)
-catkin build
+## Topics
+
+- ``~/image``: (subscribe) image topic.
+- ``~/tags``: (publish) tag detections.
+
+## Launch file arguments
+
+- ``type``: Detector type to launch ``mit`` or ``umich``. Default: ``umich``.
+- ``image_qos_profile``: QoS profile for image subscription. Allowed values: ``default``, `` sensor_data``.
+    Use this parameter to achieve QoS compatibility when subscribing to image data. Defaults to ``default``. 
+- ``image_transport``: The type of image transport to use, e.g. ``compressed``. Default: ``raw``.
+- ``tag_family``: Apriltag family. Allowed values: ``tf16h5``, ``tf25h9``, ``tf36h11``. Default: ``tf36h11``.
+    Note: The UMich detector supports additional families.
+
+### additional arguments when launching the MIT detector:
+
+- ``blur``: Sigma (in pixels) for gaussian blur. Default: 0 (no blur).
+
+### additional arguments when launching the UMich detector:
+
+- ``blur``: Sigma (in pixels) for gaussian blur. Default: 0 (no blur).
+- ``decimate_factor``: Decimate image by this amount. Factor 2 will decimate by 2 in both directions.
+    Default: 1 (no decimation).
+- ``max_allowed_hamming_distance``: discard tags with hamming error larger than this.
+    Default: 0 (no error allowed).
+- ``num_threads``: number of threads to use for processing. Default: 1.
+- ``tag_family``: Additional families allowed:
+  ``tfCircle21h7``, ``tfCircle49h12``, ``tfStandard41h12``, ``tfStandard52h13``, ``tfCustom48h12``.
+
+## License
+
+This software is issued under the Apache License Version 2.0.
 ```
 
 ### configure and build on ROS2:

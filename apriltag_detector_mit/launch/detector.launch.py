@@ -35,7 +35,7 @@ def launch_setup(context, *args, **kwargs):
         composable_node_descriptions=[
             ComposableNode(
                 package='apriltag_detector_mit',
-                plugin='apriltag_detector_mit::ApriltagDetector',
+                plugin='apriltag_detector_mit::Component',
                 namespace=LaunchConfig('camera'),
                 parameters=[
                     {

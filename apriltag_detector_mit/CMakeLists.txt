@@ -82,7 +82,7 @@ target_include_directories(
 
 ament_export_libraries(${PROJECT_NAME}_component)
 
-rclcpp_components_register_nodes(${PROJECT_NAME}_component "${PROJECT_NAME}::ApriltagDetector")
+rclcpp_components_register_nodes(${PROJECT_NAME}_component "${PROJECT_NAME}::Component")
 
 #
 # -------- node

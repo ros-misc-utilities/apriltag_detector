@@ -34,6 +34,7 @@ public:
   virtual void setDecimateFactor(double factor) = 0;
   virtual void setQuadSigma(double blur) = 0;
   virtual void setNumberOfThreads(int i) = 0;
+  virtual void setMaxAllowedHammingDistance(int) = 0;
   virtual const std::string & getFamily() const = 0;
 };
 }  // namespace apriltag_detector

@@ -52,7 +52,9 @@ NOTE: you must subscribe to the tags topic or else the detector will not subscri
 - ``max_allowed_hamming_distance``: discard tags with hamming error larger than this.
     Default: 0 (no error allowed).
 - ``num_threads``: number of threads to use for processing. Default: 1.
-- ``tag_family``: Apriltag family. Allowed values: ``tf16h5``, ``tf25h9``, ``tf36h11``. Default: ``tf36h11``.
+- ``tag_family``: Apriltag family. Allowed values: ``tf16h5``, ``tf25h9``, ``tf36h11``,
+  ``tfCircle21h7``, ``tfCircle49h12``, ``tfStandard41h12``, ``tfStandard52h13``, ``tfCustom48h12``.
+  Default: ``tf36h11``
 
 ## License
 

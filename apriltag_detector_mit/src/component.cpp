@@ -32,7 +32,7 @@ Component::Component(const rclcpp::NodeOptions & options)
   get_parameter_or(
     "image_qos_profile", image_qos_profile_, std::string("default"));
 
-  detect_pub_ = create_publisher<ApriltagArray>("~/tags", 100);
+  detect_pub_ = create_publisher<ApriltagArray>("tags", 100);
 
   // Since the ROS2 image transport does not call back when subscribers come and go
   // must check by polling
@@ -64,7 +64,7 @@ void Component::subscriptionCheckTimerExpired()
       RCLCPP_INFO(this->get_logger(), "subscribing to images!");
       image_sub_ = std::make_shared<image_transport::Subscriber>(
         image_transport::create_subscription(
-          this, "~/image",
+          this, "image",
           std::bind(&Component::callback, this, std::placeholders::_1),
           in_transport_,
           string_to_profile(
