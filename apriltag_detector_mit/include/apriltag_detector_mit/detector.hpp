@@ -32,7 +32,7 @@ namespace apriltag_detector_mit
 class Detector : public apriltag_detector::Detector
 {
 public:
-  explicit Detector();
+  Detector();
   ~Detector();
   void detect(const Image * img, ApriltagArray * tags) final;
   void setFamily(const std::string & fam) final;

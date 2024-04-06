@@ -34,8 +34,7 @@ set(ament_dependencies
   "rclcpp"
   "rclcpp_components"
   "sensor_msgs")
-  
-  
+
 foreach(pkg ${ament_dependencies})
   find_package(${pkg} REQUIRED)
 endforeach()
@@ -63,7 +62,7 @@ target_include_directories(
     $<INSTALL_INTERFACE:include>)
 
 ament_export_targets(${PROJECT_NAME}_export HAS_LIBRARY_TARGET)
-ament_export_libraries(${PROJECT_NAME})  
+ament_export_libraries(${PROJECT_NAME})
 
 #
 # --------- composable node library (exported)
