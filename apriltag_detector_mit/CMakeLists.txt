@@ -26,13 +26,16 @@ find_package(apriltag_mit)
 find_package(OpenCV REQUIRED COMPONENTS core imgproc)
 
 set(ament_dependencies
+  "apriltag_detector"
+  "apriltag_msgs"
+  "cv_bridge"
+  "image_transport"
+  "pluginlib"
   "rclcpp"
   "rclcpp_components"
-  "cv_bridge"
-  "sensor_msgs"
-  "image_transport"
-  "apriltag_msgs")
-
+  "sensor_msgs")
+  
+  
 foreach(pkg ${ament_dependencies})
   find_package(${pkg} REQUIRED)
 endforeach()
@@ -40,6 +43,9 @@ endforeach()
 if(${cv_bridge_VERSION} GREATER "3.3.0")
   add_definitions(-DUSE_CV_BRIDGE_HPP)
 endif()
+
+pluginlib_export_plugin_description_file(apriltag_detector plugins.xml)
+
 
 #
 # --------- composable node library (exported)
@@ -57,6 +63,7 @@ target_include_directories(
     $<INSTALL_INTERFACE:include>)
 
 ament_export_targets(${PROJECT_NAME}_export HAS_LIBRARY_TARGET)
+ament_export_libraries(${PROJECT_NAME})  
 
 rclcpp_components_register_nodes(${PROJECT_NAME} "${PROJECT_NAME}::ApriltagDetector")
 
@@ -116,5 +123,3 @@ if(BUILD_TESTING)
 endif()
 
 ament_package()
-
-

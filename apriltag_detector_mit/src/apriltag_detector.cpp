@@ -17,6 +17,7 @@
 
 #include <apriltag_detector_mit/apriltag_detector.hpp>
 #include <image_transport/image_transport.hpp>
+#include <pluginlib/class_list_macros.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 
 #ifdef USE_CV_BRIDGE_HPP
@@ -44,39 +45,6 @@ static std::shared_ptr<AprilTags::TagDetector> make_detector(
   return (std::make_shared<AprilTags::TagDetector>(it->second));
 }
 
-static void detectAndConvert(
-  rclcpp::Node * node, const std::string & family,
-  const std::shared_ptr<AprilTags::TagDetector> & detector,
-  const sensor_msgs::msg::Image::ConstSharedPtr & img, ApriltagArray * arrayMsg)
-{
-  // Detection
-  cv_bridge::CvImageConstPtr cvImg = cv_bridge::toCvShare(img, "mono8");
-  if (!cvImg) {
-    RCLCPP_WARN_STREAM(node->get_logger(), "cannot convert image to mono!");
-    return;
-  }
-  auto detections = detector->ExtractTags(cvImg->image);
-
-  // Convert to  Apriltag message
-  arrayMsg->detections.resize(detections.size());
-
-  for (size_t i = 0; i < detections.size(); i++) {
-    const AprilTags::TagDetection & td = detections[i];
-    auto & apriltag = arrayMsg->detections[i];
-    apriltag.family = family;
-    apriltag.id = td.id;
-    apriltag.hamming = td.hamming_distance;
-    apriltag.goodness = 0;         // what is that?,
-    apriltag.decision_margin = 0;  // not supported by MIT detector
-    apriltag.centre.x = td.cxy.x;
-    apriltag.centre.y = td.cxy.y;
-    for (size_t c = 0; c < 4; ++c) {
-      apriltag.corners[c].x = td.p[c].x;
-      apriltag.corners[c].y = td.p[c].y;
-    }
-  }
-}
-
 namespace apriltag_detector_mit
 {
 ApriltagDetector::ApriltagDetector(const rclcpp::NodeOptions & options)
@@ -91,29 +59,24 @@ ApriltagDetector::ApriltagDetector(const rclcpp::NodeOptions & options)
   if (!detector_) {
     throw(std::runtime_error("invalid tag family specified!"));
   }
-  /*
-  detector_->setDecimateFactor(get_parameter_or("decimate_factor", 1.0));
-  detector_->setQuadSigma(get_parameter_or("blur", 0.0));
-  detector_->setNumberOfThreads(get_parameter_or("num_threads", 1));
-  */
   detector_->set_black_border(get_parameter_or("border_bits", 1));
   get_parameter_or(
-    "image_qos_profile", imageQoSProfile_, std::string("default"));
+    "image_qos_profile", image_qos_profile_, std::string("default"));
 
   // publish detections
-  detectPub_ = create_publisher<ApriltagArray>("~/tags", 100);
+  detect_pub_ = create_publisher<ApriltagArray>("~/tags", 100);
 
   // Since the ROS2 image transport does not call back when subscribers come and go
   // must check by polling
-  subscriptionCheckTimer_ = rclcpp::create_timer(
+  subscription_check_timer_ = rclcpp::create_timer(
     this, get_clock(), rclcpp::Duration(1, 0),
     std::bind(&ApriltagDetector::subscriptionCheckTimerExpired, this));
 }
 
 ApriltagDetector::~ApriltagDetector()
 {
-  if (subscriptionCheckTimer_) {
-    subscriptionCheckTimer_->cancel();
+  if (subscription_check_timer_) {
+    subscription_check_timer_->cancel();
   }
 }
 
@@ -127,24 +90,25 @@ rmw_qos_profile_t string_to_profile(const std::string & s)
 
 void ApriltagDetector::subscriptionCheckTimerExpired()
 {
-  if (detectPub_->get_subscription_count()) {
+  if (detect_pub_->get_subscription_count()) {
     // -------------- subscribers ---------------------
-    if (!isSubscribed_) {
+    if (!is_subscribed_) {
       RCLCPP_INFO(this->get_logger(), "subscribing to images!");
-      imageSub_ = std::make_shared<image_transport::Subscriber>(
+      image_sub_ = std::make_shared<image_transport::Subscriber>(
         image_transport::create_subscription(
-          this, "image",
+          this, "~/image",
           std::bind(&ApriltagDetector::callback, this, std::placeholders::_1),
           in_transport_,
-          string_to_profile(imageQoSProfile_)));  // rmw_qos_profile_default);//
-      isSubscribed_ = true;
+          string_to_profile(
+            image_qos_profile_)));  // rmw_qos_profile_default);//
+      is_subscribed_ = true;
     }
   } else {
     // -------------- no subscribers -------------------
-    if (isSubscribed_) {
-      imageSub_->shutdown();
+    if (is_subscribed_) {
+      image_sub_->shutdown();
       RCLCPP_INFO(this->get_logger(), "unsubscribing from images!");
-      isSubscribed_ = false;
+      is_subscribed_ = false;
     }
   }
 }
@@ -152,14 +116,50 @@ void ApriltagDetector::subscriptionCheckTimerExpired()
 void ApriltagDetector::callback(
   const sensor_msgs::msg::Image::ConstSharedPtr & msg)
 {
-  apriltag_msgs::msg::AprilTagDetectionArray arrayMsg;
-  if (detectPub_->get_subscription_count() != 0) {
-    detectAndConvert(this, family_, detector_, msg, &arrayMsg);
-    arrayMsg.header = msg->header;
-    detectPub_->publish(arrayMsg);
+  auto array_msg =
+    std::make_unique<apriltag_msgs::msg::AprilTagDetectionArray>();
+  if (detect_pub_->get_subscription_count() != 0) {
+    detect(msg.get(), array_msg.get());
+    array_msg->header = msg->header;
+    detect_pub_->publish(std::move(array_msg));
   }
 }
 
+void ApriltagDetector::detect(const Image * img, ApriltagArray * tags)
+{
+  // Detection
+  cv_bridge::CvImageConstPtr cvImg = cv_bridge::toCvShare(
+    std::shared_ptr<const Image>(img, [](const Image *) {}), "mono8");
+  if (!cvImg) {
+    RCLCPP_WARN(
+      get_logger(),
+      "cannot convert image to mono!sensor_msgs::msg::Image::ConstSharedPtr & "
+      "img,");
+    return;
+  }
+  auto detections = detector_->ExtractTags(cvImg->image);
+
+  // Convert to  Apriltag message
+  tags->detections.resize(detections.size());
+
+  for (size_t i = 0; i < detections.size(); i++) {
+    const AprilTags::TagDetection & td = detections[i];
+    auto & apriltag = tags->detections[i];
+    apriltag.family = family_;
+    apriltag.id = td.id;
+    apriltag.hamming = td.hamming_distance;
+    apriltag.goodness = 0;         // what is that?,
+    apriltag.decision_margin = 0;  // not supported by MIT detector
+    apriltag.centre.x = td.cxy.x;
+    apriltag.centre.y = td.cxy.y;
+    for (size_t c = 0; c < 4; ++c) {
+      apriltag.corners[c].x = td.p[c].x;
+      apriltag.corners[c].y = td.p[c].y;
+    }
+  }
+}
 }  // namespace apriltag_detector_mit
 
 RCLCPP_COMPONENTS_REGISTER_NODE(apriltag_detector_mit::ApriltagDetector)
+PLUGINLIB_EXPORT_CLASS(
+  apriltag_detector_mit::ApriltagDetector, apriltag_detector::ApriltagDetector)

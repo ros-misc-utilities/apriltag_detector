@@ -16,6 +16,7 @@
 #ifndef APRILTAG_DETECTOR_MIT__APRILTAG_DETECTOR_HPP_
 #define APRILTAG_DETECTOR_MIT__APRILTAG_DETECTOR_HPP_
 
+#include <apriltag_detector/apriltag_detector.hpp>
 #include <apriltag_msgs/msg/april_tag_detection_array.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -39,23 +40,27 @@ class Subscriber;
 
 namespace apriltag_detector_mit
 {
-class ApriltagDetector : public rclcpp::Node
+class ApriltagDetector : public apriltag_detector::ApriltagDetector,
+                         public rclcpp::Node
 {
 public:
-  explicit ApriltagDetector(const rclcpp::NodeOptions & options);
+  using ApriltagArray = apriltag_msgs::msg::AprilTagDetectionArray;
+  using Image = sensor_msgs::msg::Image;
+  explicit ApriltagDetector(
+    const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
   ~ApriltagDetector();
+  virtual void detect(const Image * img, ApriltagArray * tags) final;
 
 private:
-  using ApriltagArray = apriltag_msgs::msg::AprilTagDetectionArray;
   void subscriptionCheckTimerExpired();
   void callback(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
   // ------------------------  variables ------------------------------
   std::string family_;
-  rclcpp::TimerBase::SharedPtr subscriptionCheckTimer_;
-  rclcpp::Publisher<ApriltagArray>::SharedPtr detectPub_;
-  std::shared_ptr<image_transport::Subscriber> imageSub_;
-  bool isSubscribed_{false};
-  std::string imageQoSProfile_{"default"};
+  rclcpp::TimerBase::SharedPtr subscription_check_timer_;
+  rclcpp::Publisher<ApriltagArray>::SharedPtr detect_pub_;
+  std::shared_ptr<image_transport::Subscriber> image_sub_;
+  bool is_subscribed_{false};
+  std::string image_qos_profile_{"default"};
   std::string in_transport_{"raw"};
   std::shared_ptr<AprilTags::TagDetector> detector_;
 };
