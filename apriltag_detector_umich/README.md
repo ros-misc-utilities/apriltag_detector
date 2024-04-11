@@ -3,14 +3,16 @@
 This repository has ROS2 components for detecting Apriltags using the
 [UMich Apriltag library](https://april.eecs.umich.edu/software/apriltag).
 
+Note that this package also provides a plugin that works with [pluginlib](https://github.com/ros/pluginlib/tree/ros2), meaning you can load this detector directly into your code without going through a ROS2 component.
+
 For more documentation on how to install and use this component, refer to the documentation
 of the [apriltag_detector](https://github.com/ros-misc-utilities/apriltag_detector) package.
 
-## Nodes
+## Components
 
-### apriltag\_draw
+### apriltag_detector_umich::Component
 
-- Topics (subscribed):
+- Topics (subscribed, but ONLY when there is a subscriber to ``tags``):
 
     - ``image``: image topic to use.
     - ``tags``: the detected tags from the apriltag library.

@@ -5,9 +5,9 @@ when trouble shooting apriltag detection problems. The node in this package is u
 from a launch file in the [apriltag_detector](https://github.com/ros-misc-utilities/apriltag_detector) package.
 Refer there for more information.
 
-## Nodes
+## Components
 
-### apriltag\_draw
+### apriltag\_draw::ApriltagDraw
 
 - Topics (subscribed):
     - ``tags``: the detected tags from the apriltag library.
