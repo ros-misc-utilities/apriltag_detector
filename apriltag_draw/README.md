@@ -39,8 +39,7 @@ Arguments:
 This launch script has identical arguments to ``draw.launch.py``, but is implemented as a composable
 node for illustration purposes.
 
-
-## Examples
+## Example usage
 
 ```
 ros2 launch apriltag_draw draw.launch.py  image_transport:=ffmpeg camera:=/cam_sync/cam3
