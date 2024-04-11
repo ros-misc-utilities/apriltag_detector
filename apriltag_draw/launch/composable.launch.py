@@ -29,35 +29,18 @@ def launch_setup(context, *args, **kwargs):
     trans_suffix = '' if trans == 'raw' else '/' + trans
     img_src = 'image' + trans_suffix
     img_trg = LaunchConfig('image').perform(context) + trans_suffix
-    det_type = LaunchConfig('type').perform(context)
-    pkg = 'apriltag_detector_' + det_type
     container = ComposableNodeContainer(
-        name='apriltag_detector_container',
+        name='apriltag_draw_container',
         namespace='',
         package='rclcpp_components',
         executable='component_container',
         composable_node_descriptions=[
             ComposableNode(
-                package=pkg,
-                plugin=pkg + '::Component',
+                package='apriltag_draw',
+                plugin='apriltag_draw::ApriltagDraw',
                 namespace=LaunchConfig('camera'),
-                parameters=[
-                    {
-                        'black_border_width': LaunchConfig('black_border_width'),
-                        'blur': LaunchConfig('blur'),
-                        'decimate_factor': LaunchConfig('decimate_factor'),
-                        'image_transport': LaunchConfig('image_transport'),
-                        'max_allowed_hamming_distance': LaunchConfig(
-                            'max_allowed_hamming_distance'
-                        ),
-                        'num_threads': LaunchConfig('num_threads'),
-                        'tag_family': LaunchConfig('tag_family'),
-                    }
-                ],
-                remappings=[
-                    (img_src, img_trg),
-                    ('tags', LaunchConfig('tags')),
-                ],
+                parameters=[{'image_transport': trans, 'max_queue_size': 200}],
+                remappings=[(img_src, img_trg), ('tags', LaunchConfig('tags'))],
                 extra_arguments=[{'use_intra_process_comms': True}],
             )
         ],
@@ -71,31 +54,20 @@ def generate_launch_description():
     return launch.LaunchDescription(
         [
             LaunchArg(
-                'black_border_width',
-                default_value=['1'],
-                description='width of black border (MIT only)',
+                'camera',
+                default_value=['camera'],
+                description='camera name (base topic w/o image)',
             ),
-            LaunchArg('blur', default_value=['0.0'], description='gaussian blur'),
-            LaunchArg('camera', default_value=['camera'], description='camera name'),
-            LaunchArg('decimate_factor', default_value=['1.0'], description='decimation factor'),
             LaunchArg(
                 'image',
                 default_value=['image_raw'],
                 description="image topic name, e.g. 'image_raw'",
             ),
-            LaunchArg(
-                'image_transport', default_value=['raw'], description='input image transport'
-            ),
-            LaunchArg(
-                'max_allowed_hamming_distance',
-                default_value=['0'],
-                description='maximum allowed hamming distance',
-            ),
-            LaunchArg('num_threads', default_value=['1'], description='number of threads to use'),
             LaunchArg('tags', default_value=['tags'], description="tag topic name, e.g. 'tags'"),
-            LaunchArg('tag_family', default_value=['tf36h11'], description='tag family'),
             LaunchArg(
-                'type', default_value=['umich'], description='type of detector (umich, mit)'
+                'image_transport',
+                default_value=['raw'],
+                description="image transport to use, e.g. 'raw'",
             ),
             OpaqueFunction(function=launch_setup),
         ]

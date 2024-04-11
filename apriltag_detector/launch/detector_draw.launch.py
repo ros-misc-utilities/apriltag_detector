@@ -46,7 +46,7 @@ def launch_setup(context, *args, **kwargs):
                         'black_border_width': LaunchConfig('black_border_width'),
                         'blur': LaunchConfig('blur'),
                         'decimate_factor': LaunchConfig('decimate_factor'),
-                        'image_transport': LaunchConfig('image_transport'),
+                        'image_transport': trans,
                         'max_allowed_hamming_distance': LaunchConfig(
                             'max_allowed_hamming_distance'
                         ),
@@ -54,12 +54,17 @@ def launch_setup(context, *args, **kwargs):
                         'tag_family': LaunchConfig('tag_family'),
                     }
                 ],
-                remappings=[
-                    (img_src, img_trg),
-                    ('tags', LaunchConfig('tags')),
-                ],
+                remappings=[(img_src, img_trg), ('tags', LaunchConfig('tags'))],
                 extra_arguments=[{'use_intra_process_comms': True}],
-            )
+            ),
+            ComposableNode(
+                package='apriltag_draw',
+                plugin='apriltag_draw::ApriltagDraw',
+                namespace=LaunchConfig('camera'),
+                parameters=[{'image_transport': trans, 'max_queue_size': 200}],
+                remappings=[(img_src, img_trg), ('tags', LaunchConfig('tags'))],
+                extra_arguments=[{'use_intra_process_comms': True}],
+            ),
         ],
         output='screen',
     )
@@ -91,8 +96,8 @@ def generate_launch_description():
                 default_value=['0'],
                 description='maximum allowed hamming distance',
             ),
-            LaunchArg('num_threads', default_value=['1'], description='number of threads to use'),
             LaunchArg('tags', default_value=['tags'], description="tag topic name, e.g. 'tags'"),
+            LaunchArg('num_threads', default_value=['1'], description='number of threads to use'),
             LaunchArg('tag_family', default_value=['tf36h11'], description='tag family'),
             LaunchArg(
                 'type', default_value=['umich'], description='type of detector (umich, mit)'
