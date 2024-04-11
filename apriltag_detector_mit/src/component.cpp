@@ -16,6 +16,11 @@
 #include <apriltag_detector_mit/component.hpp>
 #include <image_transport/image_transport.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
+#ifdef USE_CV_BRIDGE_HPP
+#include <cv_bridge/cv_bridge.hpp>
+#else
+#include <cv_bridge/cv_bridge.h>
+#endif
 
 namespace apriltag_detector_mit
 {
@@ -84,9 +89,14 @@ void Component::subscriptionCheckTimerExpired()
 void Component::callback(const sensor_msgs::msg::Image::ConstSharedPtr & msg)
 {
   if (detect_pub_->get_subscription_count() != 0) {
+    cv_bridge::CvImageConstPtr cvImg = cv_bridge::toCvShare(msg, "mono8");
+    if (!cvImg) {
+      RCLCPP_WARN(get_logger(), "cannot convert image to mono!");
+      return;
+    }
     auto array_msg =
       std::make_unique<apriltag_msgs::msg::AprilTagDetectionArray>();
-    detector_->detect(msg.get(), array_msg.get());
+    detector_->detect(cvImg->image, array_msg.get());
     array_msg->header = msg->header;
     detect_pub_->publish(std::move(array_msg));
   }

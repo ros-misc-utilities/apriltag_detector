@@ -19,7 +19,6 @@
 #include <apriltag_detector/detector.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/msg/image.hpp>
 #include <string>
 
 namespace AprilTags
@@ -34,7 +33,7 @@ class Detector : public apriltag_detector::Detector
 public:
   Detector();
   ~Detector();
-  void detect(const Image * img, ApriltagArray * tags) final;
+  void detect(const cv::Mat & img, ApriltagArray * tags) final;
   void setFamily(const std::string & fam) final;
   void setBlackBorder(int width) final;
   void setDecimateFactor(double) final {}

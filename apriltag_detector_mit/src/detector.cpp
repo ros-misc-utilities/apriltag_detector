@@ -18,12 +18,6 @@
 #include <apriltag_detector_mit/detector.hpp>
 #include <pluginlib/class_list_macros.hpp>
 
-#ifdef USE_CV_BRIDGE_HPP
-#include <cv_bridge/cv_bridge.hpp>
-#else
-#include <cv_bridge/cv_bridge.h>
-#endif
-
 static rclcpp::Logger get_logger()
 {
   return (rclcpp::get_logger("mit_detector"));
@@ -72,15 +66,9 @@ void Detector::setBlackBorder(int width)
   detector_->set_black_border(black_border_bits_);
 }
 
-void Detector::detect(const Image * img, ApriltagArray * tags)
+void Detector::detect(const cv::Mat & img, ApriltagArray * tags)
 {
-  cv_bridge::CvImageConstPtr cvImg = cv_bridge::toCvShare(
-    std::shared_ptr<const Image>(img, [](const Image *) {}), "mono8");
-  if (!cvImg) {
-    RCLCPP_WARN(get_logger(), "cannot convert image to mono!");
-    return;
-  }
-  auto detections = detector_->ExtractTags(cvImg->image);
+  auto detections = detector_->ExtractTags(img);
 
   // convert to  Apriltag message
   tags->detections.resize(detections.size());
