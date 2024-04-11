@@ -28,7 +28,7 @@ class Detector : public apriltag_detector::Detector
 {
 public:
   Detector();
-  void detect(const Image * img, ApriltagArray * tags) final;
+  void detect(const cv::Mat & img, ApriltagArray * tags) final;
   void setFamily(const std::string & fam) final;
   void setBlackBorder(int) final {}
   void setDecimateFactor(double) final;

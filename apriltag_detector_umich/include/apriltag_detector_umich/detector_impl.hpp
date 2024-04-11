@@ -18,8 +18,12 @@
 
 #include <apriltag_msgs/msg/april_tag_detection_array.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/msg/image.hpp>
 #include <string>
+
+namespace cv
+{
+class Mat;
+}
 
 namespace apriltag_detector_umich
 {
@@ -27,11 +31,10 @@ class DetectorImpl
 {
 public:
   using ApriltagArray = apriltag_msgs::msg::AprilTagDetectionArray;
-  using Image = sensor_msgs::msg::Image;
   DetectorImpl();
   ~DetectorImpl();
 
-  void detect(const Image * imgMsg, ApriltagArray * tags);
+  void detect(const cv::Mat & imgMsg, ApriltagArray * tags);
   void setFamily(const std::string & fam);
   void setDecimateFactor(double);
   void setQuadSigma(double);

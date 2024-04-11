@@ -37,9 +37,9 @@ const std::string & Detector::getFamily() const
   return (detector_->getFamily());
 }
 
-void Detector::detect(const Image * imgMsg, ApriltagArray * tags)
+void Detector::detect(const cv::Mat & img, ApriltagArray * tags)
 {
-  detector_->detect(imgMsg, tags);
+  detector_->detect(img, tags);
 }
 }  // namespace apriltag_detector_umich
 

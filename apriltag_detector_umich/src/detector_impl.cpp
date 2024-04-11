@@ -34,7 +34,7 @@
 
 static rclcpp::Logger get_logger()
 {
-  return (rclcpp::get_logger("umich_detector"));
+  return (rclcpp::get_logger("apriltag_umich"));
 }
 
 static apriltag_detector_t * recast(void * p)
@@ -111,6 +111,7 @@ void DetectorImpl::makeDetector()
   detector_ = apriltag_detector_create();
   tag_family_ = make_tag_family(family_);
   if (!tag_family_) {
+    RCLCPP_ERROR_STREAM(get_logger(), "invalid tag family: " << family_);
     throw(std::runtime_error("invalid tag family specified!"));
   }
   apriltag_detector_add_family_bits(
@@ -158,15 +159,8 @@ void DetectorImpl::setMaxAllowedHammingDistance(int h)
   resetDetector();
 }
 
-void DetectorImpl::detect(const Image * imgMsg, ApriltagArray * tags)
+void DetectorImpl::detect(const cv::Mat & img, ApriltagArray * tags)
 {
-  cv_bridge::CvImageConstPtr cvImg = cv_bridge::toCvShare(
-    std::shared_ptr<const Image>(imgMsg, [](const Image *) {}), "mono8");
-  if (!cvImg) {
-    RCLCPP_WARN(get_logger(), "cannot convert image to mono!");
-    return;
-  }
-  const auto & img = cvImg->image;
   image_u8_t imgu8{
     img.cols, img.rows, static_cast<int32_t>(img.step), img.data};
   zarray_t * detections = apriltag_detector_detect(recast(detector_), &imgu8);
