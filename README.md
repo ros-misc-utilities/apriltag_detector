@@ -1,86 +1,45 @@
-# ROS Apriltag detector package
+# ROS Apriltag Detector
 
-![banner image](images/apriltag_detections.png)
+![banner image](images/apriltags.png)
 
-This repository has ROS/ROS2 nodes and nodelets/components for
-detecting Apriltags using the [Apriltag 3](https://github.com/AprilRobotics/apriltag) library.
+This repository holds the following ROS2 packages for detecting and displaying [Apriltags](https://april.eecs.umich.edu/software/apriltag):
 
-## Supported platforms
+  - [apriltag_detector](./apriltag_detector/README.md): base class definitions for plugable detector libraries,
+    launch files for detecting and displaying apriltags. This is the package typically used.
 
-Currently builds under Ubuntu 22.04 with ROS2 Humble or later.
+  The following packages are accessed mostly through the above [apriltag_detector](./apriltag_detector/README.md) package.
 
-## How to build
-Create a workspace (``~/ws``), clone this repo, and use ``vcs``
-to pull in the remaining dependencies:
+  - [apriltag_draw](./apriltag_draw/README.md): components for drawing detected Apriltags onto images.
+  - [apriltag_umich](./apriltag_detector_umich/README.md): plugable library and component for detecting Apriltags using the
+    UMich implementation.
+  - [apriltag_mit](./apriltag_detector_mit/README.md): plugable library and component for detecting Apriltags using the
+    MIT implementation.
+
+The software in this repository does strictly perception, *no camera pose estimation*!
+It is typically used when no camera calibration is available, or is not needed.
+If you want perception and camera pose together, use [this package](https://github.com/christianrauch/apriltag_ros),
+which uses the same tag message format.
+
+## Installation
+
+### From packages
+
+```
+apt install ros-${ROS_DISTRO}-apriltag-detector ros-${ROS_DISTRO}-apriltag-draw \
+            ros-${ROS_DISTRO}-apriltag-detector-umich ros-${ROS_DISTRO}-apriltag-detector-mit
+```
+
+### From source
+
+The build instructions follow the standard procedure for ROS2. Set the following shell variables:
 
 ```bash
-pkg=apriltag_detector
-mkdir -p ~/$pkg/src
-cd ~/ws
-git clone https://github.com/ros-misc-utilities/${pkg}.git src/${pkg}
+repo=apriltag_detector
+url=https://github.com/ros-misc-utilities/${repo}.git
 ```
+and follow the ROS2 build instructions [here](https://github.com/ros-misc-utilities/.github/blob/master/docs/build_ros_repository.md)
 
-On ROS1 you also need the messages package:
-
-```bash
-cd src
-vcs import < ${pkg}/${pkg}.repos
-cd ..
-```
-
-Install all system packages that this package depends on:
-
-```bash
-rosdep install --from-paths src --ignore-src
-```
-
-### configure and build on ROS1:
-
-```bash
-catkin config -DCMAKE_BUILD_TYPE=RelWithDebInfo  # (optionally add -DCMAKE_EXPORT_COMPILE_COMMANDS=1)
-catkin build
-```
-
-### configure and build on ROS2:
-
-```bash
-cd ~/ws
-colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo  # (optionally add -DCMAKE_EXPORT_COMPILE_COMMANDS=1)
-```
-
-## How to use
-
-Examine the launch file and adjust the topic remapping, tag family
-etc. Then start as follows (assuming your camera publishes under /my_camera_name/image_raw):
-
-ROS1:
-```
-roslaunch apriltag_detector node.launch camera:=my_camera_name
-rqt_image_view
-```
-The detector publishes a debug image and a tag topic.
-
-
-ROS2:
-```
-ros2 launch apriltag_detector node.launch.py camera:=my_camera_name
-ros2 run rqt_image_view rqt_image_view
-```
-
-Parameters:
-
-- ``tag_family``. Apriltag family, something like "tf36h11".
-- ``max_hamming_distance``. Maximum allowable hamming distance
-  (defaults to 0).
-- ``decimate_factor``. By how much to decimate the image to speed up
-  detection. Defaults to 1 (no decimation). To half the resolution,
-  use ``decimate_factor=2``.
-- ``blur``. Gaussian blur to apply. Defaults to 0 (no blur). Can be
-  negative to sharpen.
-- ``image_qos_profile``. QoS profile of image messages that are subscribed to. Defaults to ``default``, but can also be set to ``sensor_data``. Use this parameter to achieve QoS compatibility when subscribing to image data.
-- ``num_threads``. Number of threads on which the Apriltag library
-  will operate. Defaults to 1.
-
+Make sure to source your workspace's ``install/setup.bash`` afterwards.
 
 ## License
 
