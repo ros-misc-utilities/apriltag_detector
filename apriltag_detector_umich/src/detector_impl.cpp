@@ -24,13 +24,8 @@
 #include <tagStandard52h13.h>
 
 #include <apriltag_detector_umich/detector_impl.hpp>
+#include <opencv2/core/core.hpp>
 #include <pluginlib/class_list_macros.hpp>
-
-#ifdef USE_CV_BRIDGE_HPP
-#include <cv_bridge/cv_bridge.hpp>
-#else
-#include <cv_bridge/cv_bridge.h>
-#endif
 
 static rclcpp::Logger get_logger()
 {

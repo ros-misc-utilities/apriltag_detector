@@ -19,8 +19,7 @@ import launch
 from launch.actions import DeclareLaunchArgument as LaunchArg
 from launch.actions import OpaqueFunction
 from launch.substitutions import LaunchConfiguration as LaunchConfig
-from launch_ros.actions import ComposableNodeContainer
-from launch_ros.descriptions import ComposableNode
+from launch_ros.actions import Node
 
 
 def launch_setup(context, *args, **kwargs):
@@ -29,20 +28,14 @@ def launch_setup(context, *args, **kwargs):
     trans_suffix = '' if trans == 'raw' else '/' + trans
     img_src = 'image' + trans_suffix
     img_trg = LaunchConfig('image').perform(context) + trans_suffix
-    det_type = LaunchConfig('type').perform(context)
-    pkg = 'apriltag_detector_' + det_type
-    container = ComposableNodeContainer(
-        name='apriltag_detector_container',
-        namespace='',
-        package='rclcpp_components',
-        executable='component_container',
-        composable_node_descriptions=[
-            ComposableNode(
-                package=pkg,
-                plugin=pkg + '::Component',
-                namespace=LaunchConfig('camera'),
-                parameters=[
-                    {
+    
+    node = Node(
+        package='apriltag_detector',
+        executable='apriltag_detector_node',
+        name='apriltag_detector',
+        namespace=LaunchConfig('camera'),
+        parameters=[
+                    {   'type': LaunchConfig('type'),
                         'black_border_width': LaunchConfig('black_border_width'),
                         'blur': LaunchConfig('blur'),
                         'decimate_factor': LaunchConfig('decimate_factor'),
@@ -54,17 +47,11 @@ def launch_setup(context, *args, **kwargs):
                         'tag_family': LaunchConfig('tag_family'),
                     }
                 ],
-                remappings=[
-                    (img_src, img_trg),
-                    ('tags', LaunchConfig('tags')),
-                ],
-                extra_arguments=[{'use_intra_process_comms': True}],
-            )
-        ],
-        output='screen',
-    )
-    return [container]
-
+        remappings=[
+          (img_src, img_trg),
+          ('tags', LaunchConfig('tags')),
+        ])
+    return [node]
 
 def generate_launch_description():
     """Create composable node by calling opaque function."""

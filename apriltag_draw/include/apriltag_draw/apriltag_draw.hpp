@@ -34,6 +34,8 @@ public:
   explicit ApriltagDraw(const rclcpp::NodeOptions & options);
   ~ApriltagDraw();
 
+  bool isSubscribed() const { return (is_subscribed_); }
+
 private:
   void processFrame(
     const ApriltagArray::ConstSharedPtr & tags,
@@ -42,6 +44,8 @@ private:
   void tagCallback(const ApriltagArray::ConstSharedPtr & tags);
   void processBuffers();
   void subscriptionCheckTimerExpired();
+  void subscribe();
+  void unsubscribe();
   // ------------------------  variables ------------------------------
   rclcpp::TimerBase::SharedPtr subscription_check_timer_;
   rclcpp::Subscription<ApriltagArray>::SharedPtr tag_sub_;

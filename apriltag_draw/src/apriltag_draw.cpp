@@ -94,14 +94,32 @@ ApriltagDraw::ApriltagDraw(const rclcpp::NodeOptions & options)
     string_to_profile(declare_parameter<std::string>("qos_profile", "default"));
   max_queue_size_ = declare_parameter<int>("max_queue_size", 200);
   // publish images
+#ifdef USE_MATCHED_EVENTS
+  rclcpp::PublisherOptions pub_options;
+  pub_options.event_callbacks.matched_callback =
+    [this](rclcpp::MatchedInfo & s) {
+      if (is_subscribed_) {
+        if (s.current_count == 0) {
+          unsubscribe();
+        }
+      } else {
+        if (s.current_count != 0) {
+          subscribe();
+        }
+      }
+    };
+  image_pub_ = image_transport::create_publisher(
+    this, "image_tags", rmw_qos_profile_default, pub_options);
+#else
   image_pub_ = image_transport::create_publisher(
     this, "image_tags", rmw_qos_profile_default);
 
-  // Since the ROS2 image transport does not call back when subscribers come and go
-  // must check by polling
+  // Since the early ROS2 image transport does not call back when
+  // subscribers come and go: must check by polling
   subscription_check_timer_ = rclcpp::create_timer(
     this, get_clock(), rclcpp::Duration(1, 0),
     std::bind(&ApriltagDraw::subscriptionCheckTimerExpired, this));
+#endif
 }
 
 ApriltagDraw::~ApriltagDraw()
@@ -111,44 +129,64 @@ ApriltagDraw::~ApriltagDraw()
   }
 }
 
+void ApriltagDraw::subscribe()
+{
+  RCLCPP_INFO(this->get_logger(), "subscribing to tags and image!");
+  tag_sub_ = create_subscription<ApriltagArray>(
+    "tags", rclcpp::QoS(10),
+    std::bind(&ApriltagDraw::tagCallback, this, std::placeholders::_1));
+  image_sub_ = std::make_shared<image_transport::Subscriber>(
+    image_transport::create_subscription(
+      this, "image",
+      std::bind(&ApriltagDraw::imageCallback, this, std::placeholders::_1),
+      transport_, qos_profile_));
+  is_subscribed_ = true;
+}
+
+void ApriltagDraw::unsubscribe()
+{
+  tag_sub_.reset();
+  image_sub_->shutdown();
+  RCLCPP_INFO(this->get_logger(), "unsubscribing from tags and image!");
+  is_subscribed_ = false;
+}
+
 void ApriltagDraw::subscriptionCheckTimerExpired()
 {
   if (image_pub_.getNumSubscribers() != 0) {
     // -------------- subscribers ---------------------
     if (!is_subscribed_) {
-      RCLCPP_INFO(this->get_logger(), "subscribing to tags and image!");
-      tag_sub_ = create_subscription<ApriltagArray>(
-        "tags", rclcpp::QoS(10),
-        std::bind(&ApriltagDraw::tagCallback, this, std::placeholders::_1));
-      image_sub_ = std::make_shared<image_transport::Subscriber>(
-        image_transport::create_subscription(
-          this, "image",
-          std::bind(&ApriltagDraw::imageCallback, this, std::placeholders::_1),
-          transport_, qos_profile_));
-      is_subscribed_ = true;
+      subscribe();
     }
   } else {
     // -------------- no subscribers -------------------
     if (is_subscribed_) {
-      tag_sub_.reset();
-      image_sub_->shutdown();
-      RCLCPP_INFO(this->get_logger(), "unsubscribing from tags and image!");
-      is_subscribed_ = false;
+      unsubscribe();
     }
   }
 }
 void ApriltagDraw::processFrame(
-  const ApriltagArray::ConstSharedPtr & tags, const Image::ConstSharedPtr & img)
+  const ApriltagArray::ConstSharedPtr & tags, const Image::ConstSharedPtr & msg)
 {
   if (image_pub_.getNumSubscribers() != 0) {
-    cv_bridge::CvImagePtr cvImg = cv_bridge::toCvCopy(img, "mono8");
+    cv_bridge::CvImageConstPtr cvImg;
+    try {
+      cvImg = cv_bridge::toCvShare(msg, "mono8");
+    } catch (const cv_bridge::Exception & e) {
+      if (msg->encoding == "8UC1") {
+        // hack to muddle on when encoding is wrong
+        std::shared_ptr<Image> img_copy(new Image(*msg));
+        img_copy->encoding = "mono8";
+        cvImg = cv_bridge::toCvShare(img_copy, "mono8");
+      }
+    }
     if (!cvImg) {
-      RCLCPP_ERROR_STREAM(get_logger(), "cannot convert image to mono!");
+      RCLCPP_WARN(get_logger(), "cannot convert image to mono!");
       return;
     }
     cv::Mat color_img = draw_msg(cvImg->image, *tags);
     cv_bridge::CvImage pub_img(
-      img->header, sensor_msgs::image_encodings::BGR8, color_img);
+      msg->header, sensor_msgs::image_encodings::BGR8, color_img);
     image_pub_.publish(pub_img.toImageMsg());
   }
 }
