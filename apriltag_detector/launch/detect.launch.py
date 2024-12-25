@@ -29,8 +29,6 @@ def launch_setup(context, *args, **kwargs):
     trans_suffix = '' if trans == 'raw' else '/' + trans
     img_src = 'image' + trans_suffix
     img_trg = LaunchConfig('image').perform(context) + trans_suffix
-    det_type = LaunchConfig('type').perform(context)
-    pkg = 'apriltag_detector_' + det_type
     container = ComposableNodeContainer(
         name='apriltag_detector_container',
         namespace='',
@@ -38,11 +36,12 @@ def launch_setup(context, *args, **kwargs):
         executable='component_container',
         composable_node_descriptions=[
             ComposableNode(
-                package=pkg,
-                plugin=pkg + '::Component',
+                package='apriltag_detector',
+                plugin='apriltag_detector::DetectorComponent',
                 namespace=LaunchConfig('camera'),
                 parameters=[
                     {
+                        'type': LaunchConfig('type'),
                         'black_border_width': LaunchConfig('black_border_width'),
                         'blur': LaunchConfig('blur'),
                         'decimate_factor': LaunchConfig('decimate_factor'),
