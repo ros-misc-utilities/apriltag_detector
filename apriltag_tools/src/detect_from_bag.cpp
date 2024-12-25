@@ -35,7 +35,11 @@ public:
   std::set<std::string> getTopics()
   {
     std::set<std::string> topics;
+#ifdef HAS_GET_PUBLISHERS
     const auto pubs = this->get_publishers();
+#else
+    const auto pubs = this->publishers_;
+#endif
     for (const auto & kv : pubs) {
       topics.insert(kv.first);
     }

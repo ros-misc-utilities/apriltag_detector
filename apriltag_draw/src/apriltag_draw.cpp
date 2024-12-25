@@ -94,8 +94,8 @@ ApriltagDraw::ApriltagDraw(const rclcpp::NodeOptions & options)
     string_to_profile(declare_parameter<std::string>("qos_profile", "default"));
   max_queue_size_ = declare_parameter<int>("max_queue_size", 200);
   // publish images
-  rclcpp::PublisherOptions pub_options;
 #ifdef USE_MATCHED_EVENTS
+  rclcpp::PublisherOptions pub_options;
   pub_options.event_callbacks.matched_callback =
     [this](rclcpp::MatchedInfo & s) {
       if (is_subscribed_) {
@@ -108,12 +108,12 @@ ApriltagDraw::ApriltagDraw(const rclcpp::NodeOptions & options)
         }
       }
     };
-#endif
-
   image_pub_ = image_transport::create_publisher(
     this, "image_tags", rmw_qos_profile_default, pub_options);
+#else
+  image_pub_ = image_transport::create_publisher(
+    this, "image_tags", rmw_qos_profile_default);
 
-#ifndef USE_MATCHED_EVENTS
   // Since the early ROS2 image transport does not call back when
   // subscribers come and go: must check by polling
   subscription_check_timer_ = rclcpp::create_timer(

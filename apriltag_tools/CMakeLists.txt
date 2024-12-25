@@ -35,6 +35,10 @@ foreach(pkg ${detect_from_bag_ament_dependencies})
   find_package(${pkg} REQUIRED)
 endforeach()
 
+if(${rosbag2_transport_VERSION} VERSION_GREATER_EQUAL "0.20.0")
+  add_definitions(-DHAS_GET_PUBLISHERS)
+endif()
+
 #
 # -------- nodes
 #

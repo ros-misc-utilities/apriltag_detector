@@ -28,7 +28,7 @@ find_package(rclcpp)
 find_package(rclcpp_components)
 find_package(sensor_msgs REQUIRED)
 
-if(${cv_bridge_VERSION} VERSION_GREATER "3.3.0")
+if(${cv_bridge_VERSION} VERSION_GREATER_EQUAL "4.0.0")
   add_definitions(-DUSE_CV_BRIDGE_HPP)
 endif()
 
