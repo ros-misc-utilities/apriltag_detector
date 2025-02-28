@@ -2,6 +2,11 @@
 Changelog for package apriltag_detector_mit
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* clean up apriltag_detector packages. Detector component is now in apriltag_detector.
+* Contributors: Bernd Pfrommer
+
 2.0.1 (2024-09-26)
 ------------------
 
