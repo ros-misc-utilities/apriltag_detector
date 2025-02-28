@@ -2,8 +2,8 @@
 Changelog for package apriltag_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.1 (2025-02-28)
+------------------
 * removed unnecessary pluginlib dependency
 * Contributors: Bernd Pfrommer
 
