@@ -12,7 +12,6 @@
   <depend>apriltag_detector</depend>
   <depend>apriltag_draw</depend>
   <depend>apriltag_msgs</depend>
-  <depend>plugin_lib</depend>
   <depend>rclcpp</depend>
   <depend>rosbag2_transport</depend>
 

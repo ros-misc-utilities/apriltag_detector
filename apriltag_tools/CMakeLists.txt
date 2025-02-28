@@ -26,7 +26,6 @@ set(detect_from_bag_ament_dependencies
     "apriltag_detector"
     "apriltag_draw"
     "apriltag_msgs"
-    "pluginlib"
     "rclcpp"
     "rclcpp"
     "rosbag2_transport")
