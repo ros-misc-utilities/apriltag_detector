@@ -2,6 +2,9 @@
 Changelog for package apriltag_detector_mit
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 3.0.0 (2025-02-28)
 ------------------
 * clean up apriltag_detector packages. Detector component is now in apriltag_detector.
