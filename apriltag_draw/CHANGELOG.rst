@@ -2,8 +2,8 @@
 Changelog for package apriltag_draw
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.0 (2025-02-28)
+------------------
 * use new detector structure, use image transport subscriber discovery when available
 * Contributors: Bernd Pfrommer
 
