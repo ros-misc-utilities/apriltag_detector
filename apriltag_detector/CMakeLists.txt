@@ -21,42 +21,82 @@ add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(apriltag_msgs REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(image_transport REQUIRED)
+find_package(pluginlib)
+find_package(rclcpp)
+find_package(rclcpp_components)
 find_package(sensor_msgs REQUIRED)
+
+if(${cv_bridge_VERSION} VERSION_GREATER_EQUAL "4.0.0")
+  add_definitions(-DUSE_CV_BRIDGE_HPP)
+endif()
+
+if(${rclcpp_VERSION} VERSION_GREATER_EQUAL "28.0.0")
+  add_definitions(-DUSE_MATCHED_EVENTS)
+endif()
 
 #
 # --------- header-only library
 #
-add_library(${PROJECT_NAME} INTERFACE
-  include/apriltag_detector/detector.hpp)
-  ament_target_dependencies(${PROJECT_NAME} INTERFACE sensor_msgs apriltag_msgs)
+add_library(${PROJECT_NAME} INTERFACE include/apriltag_detector/detector.hpp)
+ament_target_dependencies(${PROJECT_NAME} INTERFACE sensor_msgs apriltag_msgs)
 
 target_include_directories(
   ${PROJECT_NAME}
-  INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>)
+  INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+            $<INSTALL_INTERFACE:include>)
+#
+# --------- library with detector component
+#
+add_library(${PROJECT_NAME}_component SHARED src/detector_component.cpp)
+ament_target_dependencies(
+  ${PROJECT_NAME}_component # PUBLIC
+  sensor_msgs
+  apriltag_msgs
+  image_transport
+  cv_bridge
+  pluginlib
+  rclcpp_components)
 
+target_include_directories(
+  ${PROJECT_NAME}_component
+  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+rclcpp_components_register_nodes(${PROJECT_NAME}_component
+  "${PROJECT_NAME}::DetectorComponent")
+#
+# -------- node
+#
+add_executable(${PROJECT_NAME}_node src/detector_node.cpp)
+target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME}_component)
+
+# package-wide ament exports
 ament_export_targets(${PROJECT_NAME}_export HAS_LIBRARY_TARGET)
+ament_export_dependencies(sensor_msgs apriltag_msgs image_transport cv_bridge
+                          pluginlib rclcpp_components)
 
-# the shared library goes into the global lib dir so it can
-# be used as a composable node by other projects
+# the shared library goes into the global lib dir so it can be used as a
+# composable node by other projects
 
 install(
-  TARGETS ${PROJECT_NAME}
+  TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_component
   EXPORT ${PROJECT_NAME}_export
-  DESTINATION lib
-)
+  DESTINATION lib)
+
+# the node must go into the project specific lib directory or else the launch
+# file will not find it
+
+install(TARGETS ${PROJECT_NAME}_node DESTINATION lib/${PROJECT_NAME}/)
+
+install(DIRECTORY include/ DESTINATION include)
 
 install(
-  DIRECTORY include/
-  DESTINATION include
-)
-
-install(DIRECTORY
-  launch
+  DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}/
-  FILES_MATCHING PATTERN "*.py")
-
+  FILES_MATCHING
+  PATTERN "*.py")
 
 if(BUILD_TESTING)
   find_package(ament_cmake REQUIRED)
@@ -76,5 +116,3 @@ if(BUILD_TESTING)
 endif()
 
 ament_package()
-
-

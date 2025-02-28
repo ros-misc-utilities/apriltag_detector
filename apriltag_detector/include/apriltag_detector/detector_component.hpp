@@ -13,35 +13,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef APRILTAG_DETECTOR_MIT__COMPONENT_HPP_
-#define APRILTAG_DETECTOR_MIT__COMPONENT_HPP_
+#ifndef APRILTAG_DETECTOR__DETECTOR_COMPONENT_HPP_
+#define APRILTAG_DETECTOR__DETECTOR_COMPONENT_HPP_
 
-#include <apriltag_detector_mit/detector.hpp>
-#include <apriltag_msgs/msg/april_tag_detection_array.hpp>
-#include <memory>
+#include <apriltag_detector/detector.hpp>
+#include <image_transport/image_transport.hpp>
+#include <pluginlib/class_loader.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
-#include <string>
 
-namespace image_transport
+namespace apriltag_detector
 {
-class Subscriber;  // forward decl
-}
+using Image = sensor_msgs::msg::Image;
+using svec = std::vector<std::string>;
+using svecvec = std::vector<std::vector<std::string>>;
+using Image = sensor_msgs::msg::Image;
+using VecImagePtr = std::vector<Image::ConstSharedPtr>;
+using ApriltagArray = apriltag_msgs::msg::AprilTagDetectionArray;
+using VecApriltagArrayPtr = std::vector<ApriltagArray::ConstSharedPtr>;
 
-namespace apriltag_detector_mit
-{
-class Detector;  // forward decl
-
-class Component : public rclcpp::Node
+class DetectorComponent : public rclcpp::Node
 {
 public:
   using ApriltagArray = apriltag_msgs::msg::AprilTagDetectionArray;
   using Image = sensor_msgs::msg::Image;
-  explicit Component(
+  explicit DetectorComponent(
     const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
-  ~Component();
+  ~DetectorComponent();
+  auto getNumMessages() const { return (num_messages_); }
 
 private:
+  void subscribe();
+  void unsubscribe();
   void subscriptionCheckTimerExpired();
   void callback(const sensor_msgs::msg::Image::ConstSharedPtr & msg);
   // ------------------------  variables ------------------------------
@@ -51,7 +54,11 @@ private:
   bool is_subscribed_{false};
   std::string image_qos_profile_{"default"};
   std::string in_transport_{"raw"};
-  std::shared_ptr<Detector> detector_;
+  std::size_t num_messages_{0};
+  pluginlib::ClassLoader<apriltag_detector::Detector> detector_loader_;
+  std::shared_ptr<apriltag_detector::Detector> detector_;
 };
-}  // namespace apriltag_detector_mit
-#endif  // APRILTAG_DETECTOR_MIT__COMPONENT_HPP_
+
+}  // namespace apriltag_detector
+
+#endif  // APRILTAG_DETECTOR__DETECTOR_COMPONENT_HPP_

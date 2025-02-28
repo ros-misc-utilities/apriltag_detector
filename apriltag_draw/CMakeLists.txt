@@ -34,12 +34,15 @@ foreach(pkg ${ament_dependencies})
   find_package(${pkg} REQUIRED)
 endforeach()
 
-if(${cv_bridge_VERSION} VERSION_GREATER "3.3.0")
+if(${cv_bridge_VERSION} VERSION_GREATER_EQUAL "4.0.0")
   add_definitions(-DUSE_CV_BRIDGE_HPP)
 endif()
 
+if(${rclcpp_VERSION} VERSION_GREATER_EQUAL "28.0.0")
+  add_definitions(-DUSE_MATCHED_EVENTS)
+endif()
 #
-# --------- composable node library (private)
+# --------- composable node library (public)
 #
 add_library(${PROJECT_NAME} SHARED
   src/apriltag_draw.cpp)
@@ -47,7 +50,12 @@ add_library(${PROJECT_NAME} SHARED
 ament_target_dependencies(${PROJECT_NAME} ${ament_dependencies})
 target_link_libraries(${PROJECT_NAME} opencv_core opencv_imgproc)
 
-target_include_directories(${PROJECT_NAME} PUBLIC include)
+target_include_directories(
+  ${PROJECT_NAME}
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+
 
 rclcpp_components_register_nodes(${PROJECT_NAME} "${PROJECT_NAME}::ApriltagDraw")
 
@@ -56,6 +64,10 @@ rclcpp_components_register_nodes(${PROJECT_NAME} "${PROJECT_NAME}::ApriltagDraw"
 #
 add_executable(${PROJECT_NAME}_node src/node.cpp)
 target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME})
+
+ament_export_targets(${PROJECT_NAME}_export HAS_LIBRARY_TARGET)
+ament_export_dependencies(sensor_msgs apriltag_msgs)
+
 
 # the node must go into the paroject specific lib directory or else
 # the launch file will not find it
@@ -69,7 +81,13 @@ install(TARGETS
 
 install(
   TARGETS ${PROJECT_NAME}
+  EXPORT ${PROJECT_NAME}_export
   DESTINATION lib
+)
+
+install(
+  DIRECTORY include/
+  DESTINATION include
 )
 
 install(DIRECTORY

@@ -4,16 +4,16 @@
 
 This repository holds the following ROS2 packages for detecting and displaying [Apriltags](https://april.eecs.umich.edu/software/apriltag):
 
-  - [apriltag_detector](./apriltag_detector/README.md): base class definitions for plugable detector libraries,
+  - [apriltag_detector](./apriltag_detector/README.md): base class definitions for 
+    plugable detector libraries, node, composable component, and
     launch files for detecting and displaying apriltags. This is the package typically used.
 
   The following packages are accessed mostly through the above [apriltag_detector](./apriltag_detector/README.md) package.
 
   - [apriltag_draw](./apriltag_draw/README.md): components for drawing detected Apriltags onto images.
-  - [apriltag_umich](./apriltag_detector_umich/README.md): plugable library and component for detecting Apriltags using the
-    UMich implementation.
-  - [apriltag_mit](./apriltag_detector_mit/README.md): plugable library and component for detecting Apriltags using the
-    MIT implementation.
+  - [apriltag_umich](./apriltag_detector_umich/README.md): provides plugin for
+    running the UMich tag detector.
+  - [apriltag_mit](./apriltag_detector_mit/README.md): provides plugin for runninng the MIT tag detector.
 
 The software in this repository does strictly perception, *no camera pose estimation*!
 It is typically used when no camera calibration is available, or is not needed.

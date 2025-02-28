@@ -9,13 +9,11 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_cmake_ros</buildtool_depend>
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
-  <buildtool_depend>ros_environment</buildtool_depend> <!-- ROS_VERSION + ROS_DISTRO -->
+  <buildtool_depend>ros_environment</buildtool_depend>  <!-- ROS_VERSION + ROS_DISTRO -->
 
   <depend>apriltag_detector</depend>
-  <depend>apriltag_mit</depend> <!-- the mit apriltag library -->
+  <depend>apriltag_mit</depend>  <!-- the mit apriltag library -->
   <depend>apriltag_msgs</depend>
-  <depend>cv_bridge</depend>
-  <depend>image_transport</depend>
   <depend>pluginlib</depend>
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
