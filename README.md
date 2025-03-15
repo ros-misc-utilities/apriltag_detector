@@ -6,14 +6,16 @@ This repository holds the following ROS2 packages for detecting and displaying [
 
   - [apriltag_detector](./apriltag_detector/README.md): base class definitions for 
     plugable detector libraries, node, composable component, and
-    launch files for detecting and displaying apriltags. This is the package typically used.
-
+    launch files for detecting and displaying apriltags. This is the package directly accessed by the end user.\
+    [![Build Status](https://build.ros2.org/buildStatus/icon?job=Hdev__apriltag_detector__ubuntu_jammy_amd64&subject=Humble)](https://build.ros2.org/job/Hdev__apriltag_detector__ubuntu_jammy_amd64/)
+    [![Build Status](https://build.ros2.org/buildStatus/icon?job=Jdev__apriltag_detector__ubuntu_noble_amd64&subject=Jazzy)](https://build.ros2.org/job/Jdev__apriltag_detector__ubuntu_noble_amd64/)
+    [![Build Status](https://build.ros2.org/buildStatus/icon?job=Rdev__apriltag_detector__ubuntu_noble_amd64&subject=Rolling)](https://build.ros2.org/job/Rdev__apriltag_detector__ubuntu_noble_amd64/)
+ 
   The following packages are accessed mostly through the above [apriltag_detector](./apriltag_detector/README.md) package.
 
   - [apriltag_draw](./apriltag_draw/README.md): components for drawing detected Apriltags onto images.
-  - [apriltag_umich](./apriltag_detector_umich/README.md): provides plugin for
-    running the UMich tag detector.
-  - [apriltag_mit](./apriltag_detector_mit/README.md): provides plugin for runninng the MIT tag detector.
+  - [apriltag_detector_umich](./apriltag_detector_umich/README.md): provides plugin for running the UMich tag detector.
+  - [apriltag_detector_mit](./apriltag_detector_mit/README.md): provides plugin for runninng the MIT tag detector.
 
 The software in this repository does strictly perception, *no camera pose estimation*!
 It is typically used when no camera calibration is available, or is not needed.
