@@ -21,30 +21,35 @@ add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
+find_package(apriltag REQUIRED)
+find_package(apriltag_detector REQUIRED)
+find_package(apriltag_msgs REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(image_transport REQUIRED)
+find_package(pluginlib REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_components REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
 find_package(OpenCV REQUIRED COMPONENTS core imgproc)
 
 set(ament_dependencies
-  "apriltag"
-  "apriltag_detector"
-  "apriltag_msgs"
-  "cv_bridge"
-  "image_transport"
-  "pluginlib"
-  "rclcpp"
-  "rclcpp_components"
-  "sensor_msgs")
-
-foreach(pkg ${ament_dependencies})
-  find_package(${pkg} REQUIRED)
-endforeach()
+  apriltag
+  apriltag_detector::apriltag_detector
+  ${apriltag_msgs_TARGETS}
+  cv_bridge::cv_bridge
+  image_transport::image_transport
+  pluginlib::pluginlib
+  rclcpp::rclcpp
+  rclcpp_components::component
+  ${sensor_msgs_TARGETS}
+)
 
 if(${cv_bridge_VERSION} GREATER "3.3.0")
   add_definitions(-DUSE_CV_BRIDGE_HPP)
 endif()
 
 pluginlib_export_plugin_description_file(apriltag_detector plugins.xml)
-
 
 #
 # --------- plugin library with node-free detector (exported)
@@ -53,8 +58,7 @@ add_library(${PROJECT_NAME} SHARED
   src/detector_impl.cpp
   src/detector.cpp)
 
-ament_target_dependencies(${PROJECT_NAME} ${ament_dependencies})
-target_link_libraries(${PROJECT_NAME} apriltag)
+target_link_libraries(${PROJECT_NAME} ${ament_dependencies})
 
 target_include_directories(
   ${PROJECT_NAME}
@@ -71,8 +75,7 @@ ament_export_libraries(${PROJECT_NAME})
 add_library(${PROJECT_NAME}_component SHARED
   src/component.cpp)
 
-ament_target_dependencies(${PROJECT_NAME}_component ${ament_dependencies})
-target_link_libraries(${PROJECT_NAME}_component ${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME}_component ${ament_dependencies} ${PROJECT_NAME})
 
 target_include_directories(
   ${PROJECT_NAME}_component

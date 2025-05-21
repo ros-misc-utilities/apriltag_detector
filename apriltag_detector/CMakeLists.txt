@@ -28,7 +28,7 @@ find_package(sensor_msgs REQUIRED)
 #
 add_library(${PROJECT_NAME} INTERFACE
   include/apriltag_detector/detector.hpp)
-  ament_target_dependencies(${PROJECT_NAME} INTERFACE sensor_msgs apriltag_msgs)
+  target_link_libraries(${PROJECT_NAME} INTERFACE ${sensor_msgs_TARGETS} ${apriltag_msgs_TARGETS})
 
 target_include_directories(
   ${PROJECT_NAME}
@@ -76,5 +76,3 @@ if(BUILD_TESTING)
 endif()
 
 ament_package()
-
-
