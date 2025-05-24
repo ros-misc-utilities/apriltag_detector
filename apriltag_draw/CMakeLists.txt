@@ -21,18 +21,20 @@ add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS core imgproc)
+find_package(cv_bridge REQUIRED)
+find_package(image_transport REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_components REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(apriltag_msgs REQUIRED)
 
 set(ament_dependencies
-  "rclcpp"
-  "rclcpp_components"
-  "image_transport"
-  "cv_bridge"
-  "sensor_msgs"
-  "apriltag_msgs")
-
-foreach(pkg ${ament_dependencies})
-  find_package(${pkg} REQUIRED)
-endforeach()
+  rclcpp::rclcpp
+  rclcpp_components::component
+  image_transport::image_transport
+  cv_bridge::cv_bridge
+  ${sensor_msgs_TARGETS}
+  ${apriltag_msgs_TARGETS})
 
 if(${cv_bridge_VERSION} VERSION_GREATER_EQUAL "4.0.0")
   add_definitions(-DUSE_CV_BRIDGE_HPP)
@@ -47,8 +49,7 @@ endif()
 add_library(${PROJECT_NAME} SHARED
   src/apriltag_draw.cpp)
 
-ament_target_dependencies(${PROJECT_NAME} ${ament_dependencies})
-target_link_libraries(${PROJECT_NAME} opencv_core opencv_imgproc)
+target_link_libraries(${PROJECT_NAME} ${ament_dependencies} opencv_core opencv_imgproc)
 
 target_include_directories(
   ${PROJECT_NAME}

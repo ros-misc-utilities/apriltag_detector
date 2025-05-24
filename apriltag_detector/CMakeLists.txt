@@ -40,7 +40,7 @@ endif()
 # --------- header-only library
 #
 add_library(${PROJECT_NAME} INTERFACE include/apriltag_detector/detector.hpp)
-ament_target_dependencies(${PROJECT_NAME} INTERFACE sensor_msgs apriltag_msgs)
+target_link_libraries(${PROJECT_NAME} INTERFACE ${sensor_msgs_TARGETS} ${apriltag_msgs_TARGETS})
 
 target_include_directories(
   ${PROJECT_NAME}
@@ -50,14 +50,12 @@ target_include_directories(
 # --------- library with detector component
 #
 add_library(${PROJECT_NAME}_component SHARED src/detector_component.cpp)
-ament_target_dependencies(
-  ${PROJECT_NAME}_component # PUBLIC
-  sensor_msgs
-  apriltag_msgs
-  image_transport
-  cv_bridge
-  pluginlib
-  rclcpp_components)
+target_link_libraries(${PROJECT_NAME}_component ${sensor_msgs_TARGETS}
+  ${apriltag_msgs_TARGETS}
+  image_transport::image_transport
+  cv_bridge::cv_bridge
+  pluginlib::pluginlib
+  rclcpp_components::component)
 
 target_include_directories(
   ${PROJECT_NAME}_component
@@ -80,8 +78,9 @@ ament_export_dependencies(sensor_msgs apriltag_msgs image_transport cv_bridge
 # the shared library goes into the global lib dir so it can be used as a
 # composable node by other projects
 
-install(
-  TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_component
+install(TARGETS
+  ${PROJECT_NAME}
+  ${PROJECT_NAME}_component
   EXPORT ${PROJECT_NAME}_export
   DESTINATION lib)
 

@@ -21,14 +21,25 @@ add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(ament_cmake_ros REQUIRED)
-find_package(apriltag_mit)
+find_package(apriltag_detector REQUIRED)
+find_package(apriltag_mit REQUIRED)
+find_package(apriltag_msgs REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(image_transport REQUIRED)
+find_package(pluginlib REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_components REQUIRED)
+find_package(sensor_msgs REQUIRED)
 
-set(ament_dependencies "apriltag_detector" "apriltag_msgs" "pluginlib" "rclcpp"
-  "sensor_msgs")
-
-foreach(pkg ${ament_dependencies})
-  find_package(${pkg} REQUIRED)
-endforeach()
+set(ament_dependencies
+  apriltag_detector::apriltag_detector
+  ${apriltag_msgs_TARGETS}
+  cv_bridge::cv_bridge
+  image_transport::image_transport
+  pluginlib::pluginlib
+  rclcpp::rclcpp
+  rclcpp_components::component
+  ${sensor_msgs_TARGETS})
 
 #
 # --------- plugin library (exported)
@@ -37,8 +48,7 @@ pluginlib_export_plugin_description_file(apriltag_detector plugins.xml)
 
 add_library(${PROJECT_NAME} SHARED src/detector.cpp)
 
-ament_target_dependencies(${PROJECT_NAME} ${ament_dependencies})
-target_link_libraries(${PROJECT_NAME} apriltag_mit::apriltag_mit)
+target_link_libraries(${PROJECT_NAME} ${ament_dependencies} apriltag_mit::apriltag_mit)
 
 target_include_directories(
   ${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
