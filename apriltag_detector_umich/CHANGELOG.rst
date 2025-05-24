@@ -2,8 +2,8 @@
 Changelog for package apriltag_detector_umich
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.2 (2025-05-24)
+------------------
 * no longer use ament_target_dependencies
 * Contributors: Bernd Pfrommer
 
