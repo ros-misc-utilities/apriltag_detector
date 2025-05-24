@@ -21,18 +21,19 @@ add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS core imgproc)
+find_package(apriltag_detector REQUIRED)
+find_package(apriltag_draw REQUIRED)
+find_package(apriltag_msgs REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rosbag2_transport REQUIRED)
 
 set(detect_from_bag_ament_dependencies
-    "apriltag_detector"
-    "apriltag_draw"
-    "apriltag_msgs"
-    "rclcpp"
-    "rclcpp"
-    "rosbag2_transport")
+  apriltag_detector::apriltag_detector_component
+  apriltag_draw::apriltag_draw
+  ${apriltag_msgs_TARGETS}
+  rclcpp::rclcpp
+  rosbag2_transport::rosbag2_transport)
 
-foreach(pkg ${detect_from_bag_ament_dependencies})
-  find_package(${pkg} REQUIRED)
-endforeach()
 
 if(${rosbag2_transport_VERSION} VERSION_GREATER_EQUAL "0.20.0")
   add_definitions(-DHAS_GET_PUBLISHERS)
@@ -42,7 +43,7 @@ endif()
 # -------- nodes
 #
 add_executable(detect_from_bag src/detect_from_bag.cpp)
-ament_target_dependencies(detect_from_bag ${detect_from_bag_ament_dependencies})
+target_link_libraries(detect_from_bag ${detect_from_bag_ament_dependencies})
 
 # the node must go into the project specific lib directory
 
