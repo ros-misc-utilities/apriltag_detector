@@ -2,6 +2,11 @@
 Changelog for package apriltag_detector_mit
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* no longer use ament_target_dependencies
+* Contributors: Bernd Pfrommer
+
 3.0.1 (2025-02-28)
 ------------------
 
