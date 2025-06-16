@@ -16,7 +16,10 @@
 cmake_minimum_required(VERSION 3.16)
 project(apriltag_detector)
 
-add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+endif()
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
@@ -81,8 +84,7 @@ ament_export_dependencies(sensor_msgs apriltag_msgs image_transport cv_bridge
 install(TARGETS
   ${PROJECT_NAME}
   ${PROJECT_NAME}_component
-  EXPORT ${PROJECT_NAME}_export
-  DESTINATION lib)
+  EXPORT ${PROJECT_NAME}_export)
 
 # the node must go into the project specific lib directory or else the launch
 # file will not find it
