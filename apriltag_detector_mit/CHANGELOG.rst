@@ -2,6 +2,14 @@
 Changelog for package apriltag_detector_mit
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix compilation and loading of shared libraries on Windows
+  * Fix compilation and running on Windows
+  ---------
+  Co-authored-by: Bernd Pfrommer <bernd.pfrommer@gmail.com>
+* Contributors: Bernd Pfrommer, Silvio Traversaro
+
 3.0.2 (2025-05-24)
 ------------------
 * no longer use ament_target_dependencies
