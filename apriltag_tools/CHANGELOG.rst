@@ -2,8 +2,8 @@
 Changelog for package apriltag_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.3 (2025-07-29)
+------------------
 * Merge branch 'master' into release
 * Fix compilation and loading of shared libraries on Windows
   * Fix compilation and running on Windows

@@ -2,8 +2,8 @@
 Changelog for package apriltag_draw
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.3 (2025-07-29)
+------------------
 * avoid deprecated image transport functions
 * Fix compilation and loading of shared libraries on Windows
   * Fix compilation and running on Windows

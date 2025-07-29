@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>apriltag_detector_mit</name>
-  <version>3.0.2</version>
+  <version>3.0.3</version>
   <description>ROS package for apriltag detection with MIT detector</description>
   <maintainer email="bernd.pfrommer@gmail.com">Bernd Pfrommer</maintainer>
   <license>Apache2</license>

@@ -2,8 +2,8 @@
 Changelog for package apriltag_detector_umich
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.0.3 (2025-07-29)
+------------------
 * Apriltag-detector-umich windows
   See https://github.com/RoboStack/ros-jazzy/pull/77
 * Fix compilation and loading of shared libraries on Windows
