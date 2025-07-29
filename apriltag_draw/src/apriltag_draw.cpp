@@ -86,6 +86,18 @@ static rmw_qos_profile_t string_to_profile(const std::string & s)
   return (rmw_qos_profile_default);
 }
 
+#ifdef IMAGE_TRANSPORT_USE_QOS
+static rclcpp::QoS convert_profile(const rmw_qos_profile_t & p)
+{
+  return (rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(p), p));
+}
+#else
+static const rmw_qos_profile_t & convert_profile(const rmw_qos_profile_t & p)
+{
+  return (p);
+}
+#endif
+
 ApriltagDraw::ApriltagDraw(const rclcpp::NodeOptions & options)
 : Node("apriltag_draw", options)
 {
@@ -109,10 +121,10 @@ ApriltagDraw::ApriltagDraw(const rclcpp::NodeOptions & options)
       }
     };
   image_pub_ = image_transport::create_publisher(
-    this, "image_tags", rmw_qos_profile_default, pub_options);
+    this, "image_tags", convert_profile(rmw_qos_profile_default), pub_options);
 #else
   image_pub_ = image_transport::create_publisher(
-    this, "image_tags", rmw_qos_profile_default);
+    this, "image_tags", convert_profile(rmw_qos_profile_default));
 
   // Since the early ROS2 image transport does not call back when
   // subscribers come and go: must check by polling
@@ -139,7 +151,7 @@ void ApriltagDraw::subscribe()
     image_transport::create_subscription(
       this, "image",
       std::bind(&ApriltagDraw::imageCallback, this, std::placeholders::_1),
-      transport_, qos_profile_));
+      transport_, convert_profile(qos_profile_)));
   is_subscribed_ = true;
 }
 

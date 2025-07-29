@@ -92,14 +92,26 @@ rmw_qos_profile_t string_to_profile(const std::string & s)
   return (rmw_qos_profile_default);
 }
 
+#ifdef IMAGE_TRANSPORT_USE_QOS
+static rclcpp::QoS convert_profile(const rmw_qos_profile_t & p)
+{
+  return (rclcpp::QoS(rclcpp::QoSInitialization::from_rmw(p), p));
+}
+#else
+static const rmw_qos_profile_t & convert_profile(const rmw_qos_profile_t & p)
+{
+  return (p);
+}
+#endif
+
 void DetectorComponent::subscribe()
 {
+  const auto profile = string_to_profile(image_qos_profile_);
   image_sub_ = std::make_shared<image_transport::Subscriber>(
     image_transport::create_subscription(
       this, "image",
       std::bind(&DetectorComponent::callback, this, std::placeholders::_1),
-      in_transport_,
-      string_to_profile(image_qos_profile_)));  // rmw_qos_profile_default);//
+      in_transport_, convert_profile(profile)));
   is_subscribed_ = true;
 }
 
