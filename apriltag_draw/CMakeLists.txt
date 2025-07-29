@@ -16,7 +16,10 @@
 cmake_minimum_required(VERSION 3.16)
 project(apriltag_draw)
 
-add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+endif()
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
@@ -42,6 +45,10 @@ endif()
 
 if(${rclcpp_VERSION} VERSION_GREATER_EQUAL "28.0.0")
   add_definitions(-DUSE_MATCHED_EVENTS)
+endif()
+
+if(${image_transport_VERSION} VERSION_GREATER_EQUAL "6.3.0")
+  add_definitions(-DIMAGE_TRANSPORT_USE_QOS)
 endif()
 #
 # --------- composable node library (public)
@@ -83,7 +90,6 @@ install(TARGETS
 install(
   TARGETS ${PROJECT_NAME}
   EXPORT ${PROJECT_NAME}_export
-  DESTINATION lib
 )
 
 install(
