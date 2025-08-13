@@ -61,6 +61,7 @@ int main(int argc, char ** argv)
     rclcpp::shutdown();
     throw std::runtime_error("must specify image_topic parameter!");
   }
+  dummy_node.reset(); // delete dummy node object
 
   rclcpp::executors::SingleThreadedExecutor exec;
 
@@ -151,7 +152,9 @@ int main(int argc, char ** argv)
   exec.spin_some();  // for recording the last message
 
   RCLCPP_INFO_STREAM(
-    get_logger(), "num messages detected: " << detector_node->getNumMessages());
+    get_logger(), "num messages found: " << detector_node->getNumMessages());
+  RCLCPP_INFO_STREAM(
+    get_logger(), "num tags detected: " << detector_node->getNumTagsDetected());
   RCLCPP_INFO(get_logger(), "detect_from_bag finished!");
   rclcpp::shutdown();
   return 0;
