@@ -160,6 +160,7 @@ void DetectorComponent::callback(
       std::make_unique<apriltag_msgs::msg::AprilTagDetectionArray>();
     detector_->detect(cvImg->image, array_msg.get());
     array_msg->header = msg->header;
+    num_tags_detected_ += array_msg->detections.size();
     detect_pub_->publish(std::move(array_msg));
   }
 }
