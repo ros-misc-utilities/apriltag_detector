@@ -61,7 +61,7 @@ int main(int argc, char ** argv)
     rclcpp::shutdown();
     throw std::runtime_error("must specify image_topic parameter!");
   }
-  dummy_node.reset(); // delete dummy node object
+  dummy_node.reset();  // delete dummy node object
 
   rclcpp::executors::SingleThreadedExecutor exec;
 
@@ -108,6 +108,7 @@ int main(int argc, char ** argv)
     {Parameter("storage.uri", in_uri),
      Parameter("play.clock_publish_on_topic_publish", true),
      Parameter("play.start_paused", true), Parameter("play.rate", 0.9),
+     Parameter("play.progress_bar_update_rate", 0),
      Parameter("play.disable_keyboard_controls", true)});
   player_options.use_intra_process_comms(true);
   auto player_node =
@@ -139,7 +140,9 @@ int main(int argc, char ** argv)
 
   exec.add_node(recorder_node);
   if (player_node->play_next() && rclcpp::ok()) {
-    while (rclcpp::ok() && !draw_node->isSubscribed()) {
+    while (rclcpp::ok() &&
+           !(draw_node->isSubscribed() && detector_node->isSubscribed() &&
+             recorder_node->subscriptions().size() == topics.size())) {
       exec.spin_some();
     }
   }

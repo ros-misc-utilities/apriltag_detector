@@ -42,7 +42,7 @@ public:
   ~DetectorComponent();
   auto getNumMessages() const { return (num_messages_); }
   auto getNumTagsDetected() const { return (num_tags_detected_); }
-  void resetNumTagsDetected() { num_tags_detected_ = 0; }
+  auto isSubscribed() const { return (is_subscribed_); }
 
 private:
   void subscribe();
