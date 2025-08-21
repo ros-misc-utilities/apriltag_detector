@@ -56,6 +56,10 @@ int main(int argc, char ** argv)
   auto dummy_node = std::make_shared<rclcpp::Node>("dummy_node");
   const std::string image_topic =
     dummy_node->declare_parameter<std::string>("image_topic", "");
+  const std::string image_tag_topic =
+    dummy_node->declare_parameter<std::string>("image_tag_topic", "image_tags");
+  const std::string tag_topic =
+    dummy_node->declare_parameter<std::string>("tag_topic", "tags");
   if (image_topic.empty()) {
     RCLCPP_ERROR(get_logger(), "must specify image_topic parameter!");
     rclcpp::shutdown();
@@ -77,15 +81,14 @@ int main(int argc, char ** argv)
     std::make_shared<apriltag_detector::DetectorComponent>(detector_options);
 
   exec.add_node(detector_node);
-
   const std::vector<std::string> draw_remap = {
     "--ros-args",
     "--remap",
     "image:=" + image_topic,
     "--remap",
-    "tags:=" + image_topic + "/tags",
+    "tags:=" + image_topic + "/" + tag_topic,
     "--remap",
-    "image_tags:=" + image_topic + "/image_tags"};
+    "image_tags:=" + image_topic + "/" + image_tag_topic};
 
   rclcpp::NodeOptions draw_options;
   draw_options.arguments(draw_remap);
@@ -117,8 +120,8 @@ int main(int argc, char ** argv)
   const auto topic_set = player_node->getTopics();
   std::vector<std::string> topics;
   std::copy(topic_set.begin(), topic_set.end(), std::back_inserter(topics));
-  topics.push_back(image_topic + "/tags");
-  topics.push_back(image_topic + "/image_tags");
+  topics.push_back(image_topic + "/" + tag_topic);
+  topics.push_back(image_topic + "/" + image_tag_topic);
 
   const std::string out_uri =
     detector_node->get_parameter_or("out_bag", std::string());
