@@ -12,6 +12,8 @@ This node runs an apriltag detector on a bag with images and produces an output 
 - Parameters:
     - ``in_bag``: path of input bag
     - ``image_topic``: name of image topic on which to run the AprilTag detector
+    - ``image_tag_topic``: output topic for images with detected AprilTags shown
+    - ``tag_topic``: output topic for detected tags
     - ``out_bag``: path of output bag
 
 Example:
