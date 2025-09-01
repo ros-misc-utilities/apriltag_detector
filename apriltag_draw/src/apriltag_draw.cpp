@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #include <apriltag_draw/apriltag_draw.hpp>
-#ifdef USE_CV_BRIDGE_HPP
+#if __has_include(<cv_bridge/cv_bridge.hpp>)
 #include <cv_bridge/cv_bridge.hpp>
 #else
 #include <cv_bridge/cv_bridge.h>
@@ -121,10 +121,20 @@ ApriltagDraw::ApriltagDraw(const rclcpp::NodeOptions & options)
       }
     };
   image_pub_ = image_transport::create_publisher(
-    this, "image_tags", convert_profile(rmw_qos_profile_default), pub_options);
+#ifdef IMAGE_TRANSPORT_USE_NODEINTERFACE
+    *this,
+#else
+    this,
+#endif
+    "image_tags", convert_profile(rmw_qos_profile_default), pub_options);
 #else
   image_pub_ = image_transport::create_publisher(
-    this, "image_tags", convert_profile(rmw_qos_profile_default));
+#ifdef IMAGE_TRANSPORT_USE_NODEINTERFACE
+    *this,
+#else
+    this,
+#endif
+    "image_tags", convert_profile(rmw_qos_profile_default));
 
   // Since the early ROS2 image transport does not call back when
   // subscribers come and go: must check by polling
@@ -149,7 +159,12 @@ void ApriltagDraw::subscribe()
     std::bind(&ApriltagDraw::tagCallback, this, std::placeholders::_1));
   image_sub_ = std::make_shared<image_transport::Subscriber>(
     image_transport::create_subscription(
-      this, "image",
+#ifdef IMAGE_TRANSPORT_USE_NODEINTERFACE
+      *this,
+#else
+      this,
+#endif
+      "image",
       std::bind(&ApriltagDraw::imageCallback, this, std::placeholders::_1),
       transport_, convert_profile(qos_profile_)));
   is_subscribed_ = true;
