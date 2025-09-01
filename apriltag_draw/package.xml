@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>apriltag_draw</name>
-  <version>3.0.3</version>
+  <version>3.0.4</version>
   <description>ROS package for drawing apriltags on image</description>
   <maintainer email="bernd.pfrommer@gmail.com">Bernd Pfrommer</maintainer>
   <license>Apache2</license>
