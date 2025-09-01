@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #include <apriltag_detector/detector_component.hpp>
-#ifdef USE_CV_BRIDGE_HPP
+#if __has_include(<cv_bridge/cv_bridge.hpp>)
 #include <cv_bridge/cv_bridge.hpp>
 #else
 #include <cv_bridge/cv_bridge.h>
@@ -109,7 +109,12 @@ void DetectorComponent::subscribe()
   const auto profile = string_to_profile(image_qos_profile_);
   image_sub_ = std::make_shared<image_transport::Subscriber>(
     image_transport::create_subscription(
-      this, "image",
+#ifdef IMAGE_TRANSPORT_USE_NODEINTERFACE
+      *this,
+#else
+      this,
+#endif
+      "image",
       std::bind(&DetectorComponent::callback, this, std::placeholders::_1),
       in_transport_, convert_profile(profile)));
   is_subscribed_ = true;
@@ -160,6 +165,7 @@ void DetectorComponent::callback(
       std::make_unique<apriltag_msgs::msg::AprilTagDetectionArray>();
     detector_->detect(cvImg->image, array_msg.get());
     array_msg->header = msg->header;
+    num_tags_detected_ += array_msg->detections.size();
     detect_pub_->publish(std::move(array_msg));
   }
 }

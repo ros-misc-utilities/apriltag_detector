@@ -41,6 +41,8 @@ public:
     const rclcpp::NodeOptions & options = rclcpp::NodeOptions());
   ~DetectorComponent();
   auto getNumMessages() const { return (num_messages_); }
+  auto getNumTagsDetected() const { return (num_tags_detected_); }
+  auto isSubscribed() const { return (is_subscribed_); }
 
 private:
   void subscribe();
@@ -55,6 +57,7 @@ private:
   std::string image_qos_profile_{"default"};
   std::string in_transport_{"raw"};
   std::size_t num_messages_{0};
+  std::size_t num_tags_detected_{0};
   pluginlib::ClassLoader<apriltag_detector::Detector> detector_loader_;
   std::shared_ptr<apriltag_detector::Detector> detector_;
 };

@@ -56,11 +56,16 @@ int main(int argc, char ** argv)
   auto dummy_node = std::make_shared<rclcpp::Node>("dummy_node");
   const std::string image_topic =
     dummy_node->declare_parameter<std::string>("image_topic", "");
+  const std::string image_tag_topic =
+    dummy_node->declare_parameter<std::string>("image_tag_topic", "image_tags");
+  const std::string tag_topic =
+    dummy_node->declare_parameter<std::string>("tag_topic", "tags");
   if (image_topic.empty()) {
     RCLCPP_ERROR(get_logger(), "must specify image_topic parameter!");
     rclcpp::shutdown();
     throw std::runtime_error("must specify image_topic parameter!");
   }
+  dummy_node.reset();  // delete dummy node object
 
   rclcpp::executors::SingleThreadedExecutor exec;
 
@@ -76,15 +81,14 @@ int main(int argc, char ** argv)
     std::make_shared<apriltag_detector::DetectorComponent>(detector_options);
 
   exec.add_node(detector_node);
-
   const std::vector<std::string> draw_remap = {
     "--ros-args",
     "--remap",
     "image:=" + image_topic,
     "--remap",
-    "tags:=" + image_topic + "/tags",
+    "tags:=" + image_topic + "/" + tag_topic,
     "--remap",
-    "image_tags:=" + image_topic + "/image_tags"};
+    "image_tags:=" + image_topic + "/" + image_tag_topic};
 
   rclcpp::NodeOptions draw_options;
   draw_options.arguments(draw_remap);
@@ -107,6 +111,7 @@ int main(int argc, char ** argv)
     {Parameter("storage.uri", in_uri),
      Parameter("play.clock_publish_on_topic_publish", true),
      Parameter("play.start_paused", true), Parameter("play.rate", 0.9),
+     Parameter("play.progress_bar_update_rate", 0),
      Parameter("play.disable_keyboard_controls", true)});
   player_options.use_intra_process_comms(true);
   auto player_node =
@@ -115,8 +120,8 @@ int main(int argc, char ** argv)
   const auto topic_set = player_node->getTopics();
   std::vector<std::string> topics;
   std::copy(topic_set.begin(), topic_set.end(), std::back_inserter(topics));
-  topics.push_back(image_topic + "/tags");
-  topics.push_back(image_topic + "/image_tags");
+  topics.push_back(image_topic + "/" + tag_topic);
+  topics.push_back(image_topic + "/" + image_tag_topic);
 
   const std::string out_uri =
     detector_node->get_parameter_or("out_bag", std::string());
@@ -138,7 +143,9 @@ int main(int argc, char ** argv)
 
   exec.add_node(recorder_node);
   if (player_node->play_next() && rclcpp::ok()) {
-    while (rclcpp::ok() && !draw_node->isSubscribed()) {
+    while (rclcpp::ok() &&
+           !(draw_node->isSubscribed() && detector_node->isSubscribed() &&
+             recorder_node->subscriptions().size() == topics.size())) {
       exec.spin_some();
     }
   }
@@ -151,7 +158,9 @@ int main(int argc, char ** argv)
   exec.spin_some();  // for recording the last message
 
   RCLCPP_INFO_STREAM(
-    get_logger(), "num messages detected: " << detector_node->getNumMessages());
+    get_logger(), "num messages found: " << detector_node->getNumMessages());
+  RCLCPP_INFO_STREAM(
+    get_logger(), "num tags detected: " << detector_node->getNumTagsDetected());
   RCLCPP_INFO(get_logger(), "detect_from_bag finished!");
   rclcpp::shutdown();
   return 0;
