@@ -2,6 +2,13 @@
 Changelog for package apriltag_detector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* support new image transport node interface
+* add isSubscribed() to detector interface and fixed bug in detect_from_bag
+* added getNumTagsDetected()
+* Contributors: Bernd Pfrommer
+
 3.0.3 (2025-07-29)
 ------------------
 * avoid deprecated image transport functions

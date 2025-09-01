@@ -2,6 +2,13 @@
 Changelog for package apriltag_tools
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* add tag_topic and image_tag_topic parameters
+* add isSubscribed() to detector interface and fixed bug in detect_from_bag
+* added getNumTagsDetected()
+* Contributors: Bernd Pfrommer
+
 3.0.3 (2025-07-29)
 ------------------
 * Merge branch 'master' into release

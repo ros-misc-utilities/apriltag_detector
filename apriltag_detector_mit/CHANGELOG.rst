@@ -2,6 +2,9 @@
 Changelog for package apriltag_detector_mit
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 3.0.3 (2025-07-29)
 ------------------
 * Fix compilation and loading of shared libraries on Windows
