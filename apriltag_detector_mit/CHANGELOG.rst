@@ -2,6 +2,11 @@
 Changelog for package apriltag_detector_mit
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fix install destinations for libraries
+* Contributors: Bernd Pfrommer
+
 3.0.4 (2025-09-01)
 ------------------
 
