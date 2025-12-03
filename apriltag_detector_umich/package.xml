@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>apriltag_detector_umich</name>
-  <version>3.0.4</version>
+  <version>3.1.0</version>
   <description>ROS package for apriltag detection with the UMich detector</description>
   <maintainer email="bernd.pfrommer@gmail.com">Bernd Pfrommer</maintainer>
   <license>Apache2</license>

@@ -2,8 +2,8 @@
 Changelog for package apriltag_detector
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+3.1.0 (2025-12-03)
+------------------
 * fix install destinations for libraries
 * Contributors: Bernd Pfrommer
 
